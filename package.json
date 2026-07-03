@@ -1,0 +1,24 @@
+{
+  "name": "gke-utilization-extract",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Pull raw GKE container resource-utilization time series from Cloud Monitoring into a single CSV (no aggregation).",
+  "bin": {
+    "gke-utilization-extract": "dist/extract-gke-utilization.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/extract-gke-utilization.js",
+    "extract": "npm run build && node dist/extract-gke-utilization.js"
+  },
+  "engines": {
+    "node": ">=18.17"
+  },
+  "dependencies": {
+    "@google-cloud/monitoring": "^4.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.0",
+    "typescript": "^5.5.0"
+  }
+}
