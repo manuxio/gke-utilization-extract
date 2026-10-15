@@ -1,0 +1,121 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    deployment.kubernetes.io/revision: "5"
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{},"name":"fpi-comitati-web","namespace":"default"},"spec":{"replicas":1,"selector":{"matchLabels":{"app":"fpi-comitati-web"}},"template":{"metadata":{"labels":{"app":"fpi-comitati-web"}},"spec":{"containers":[{"env":[{"name":"APPLICATIVO","value":"fpi_comitati"},{"name":"DB_HOST","value":"10.170.76.24"},{"name":"DB_SCHEMA","value":"web_fpi_comitati"}],"envFrom":[{"secretRef":{"name":"sendgrid-smtp"}},{"secretRef":{"name":"fpi-comitati-web-db"}},{"configMapRef":{"name":"vcf"}}],"image":"europe-west8-docker.pkg.dev/n-gke-fsn-prod-488511/repo-prod/joomla-comitati-fpi-php72:0.9","imagePullPolicy":"IfNotPresent","livenessProbe":{"failureThreshold":3,"httpGet":{"path":"/administrator/","port":"http","scheme":"HTTP"},"initialDelaySeconds":15,"periodSeconds":30,"successThreshold":1,"timeoutSeconds":15},"name":"fpi-comitati-web","ports":[{"containerPort":80,"name":"http","protocol":"TCP"}],"readinessProbe":{"failureThreshold":3,"httpGet":{"path":"/administrator/","port":"http","scheme":"HTTP"},"initialDelaySeconds":15,"periodSeconds":30,"successThreshold":1,"timeoutSeconds":15},"resources":{"limits":{"cpu":"500m","ephemeral-storage":"1Gi","memory":"1024Mi"},"requests":{"cpu":"250m","ephemeral-storage":"1Gi","memory":"1024Mi"}},"securityContext":{"capabilities":{"add":["NET_RAW"]}},"volumeMounts":[{"mountPath":"/var/www/html/app","name":"fpi-comitati-web-docroot"}]}],"volumes":[{"name":"fpi-comitati-web-docroot","persistentVolumeClaim":{"claimName":"fpi-comitati-web-docroot"}}]}}}}
+  creationTimestamp: "2026-05-13T13:05:55Z"
+  generation: 49
+  name: fpi-comitati-web
+  namespace: default
+  resourceVersion: "1783043185191727010"
+  uid: bb07bc6a-c2e7-4d0a-8144-4aa55b97b15b
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: fpi-comitati-web
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      annotations:
+        kubectl.kubernetes.io/restartedAt: "2026-05-28T13:19:43Z"
+      labels:
+        app: fpi-comitati-web
+    spec:
+      containers:
+      - env:
+        - name: APPLICATIVO
+          value: fpi_comitati
+        - name: DB_HOST
+          value: 10.170.76.24
+        - name: DB_SCHEMA
+          value: web_fpi_comitati
+        envFrom:
+        - secretRef:
+            name: sendgrid-smtp
+        - secretRef:
+            name: fpi-comitati-web-db
+        - configMapRef:
+            name: vcf
+        image: europe-west8-docker.pkg.dev/n-gke-fsn-prod-488511/repo-prod/joomla-comitati-fpi-php72:0.9
+        imagePullPolicy: IfNotPresent
+        livenessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /administrator/
+            port: http
+            scheme: HTTP
+          initialDelaySeconds: 15
+          periodSeconds: 30
+          successThreshold: 1
+          timeoutSeconds: 15
+        name: fpi-comitati-web
+        ports:
+        - containerPort: 80
+          name: http
+          protocol: TCP
+        readinessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /administrator/
+            port: http
+            scheme: HTTP
+          initialDelaySeconds: 15
+          periodSeconds: 30
+          successThreshold: 1
+          timeoutSeconds: 15
+        resources:
+          limits:
+            cpu: 500m
+            ephemeral-storage: 1Gi
+            memory: 1Gi
+          requests:
+            cpu: 250m
+            ephemeral-storage: 1Gi
+            memory: 1Gi
+        securityContext:
+          capabilities:
+            add:
+            - NET_RAW
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /var/www/html/app
+          name: fpi-comitati-web-docroot
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - name: fpi-comitati-web-docroot
+        persistentVolumeClaim:
+          claimName: fpi-comitati-web-docroot
+status:
+  availableReplicas: 1
+  conditions:
+  - lastTransitionTime: "2026-05-20T11:16:52Z"
+    lastUpdateTime: "2026-06-23T16:02:33Z"
+    message: ReplicaSet "fpi-comitati-web-6d79db49fc" has successfully progressed.
+    reason: NewReplicaSetAvailable
+    status: "True"
+    type: Progressing
+  - lastTransitionTime: "2026-07-03T01:41:17Z"
+    lastUpdateTime: "2026-07-03T01:41:17Z"
+    message: Deployment has minimum availability.
+    reason: MinimumReplicasAvailable
+    status: "True"
+    type: Available
+  observedGeneration: 49
+  readyReplicas: 1
+  replicas: 1
+  terminatingReplicas: 0
+  updatedReplicas: 1

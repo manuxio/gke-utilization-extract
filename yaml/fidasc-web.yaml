@@ -1,0 +1,117 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    deployment.kubernetes.io/revision: "3"
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{},"name":"fidasc-web","namespace":"default"},"spec":{"replicas":1,"selector":{"matchLabels":{"app":"fidasc-web"}},"template":{"metadata":{"labels":{"app":"fidasc-web"}},"spec":{"containers":[{"env":[{"name":"DB_HOST","value":"10.170.76.24"},{"name":"DB_SCHEMA","value":"web_rest_fidasc"}],"envFrom":[{"secretRef":{"name":"sendgrid-smtp"}},{"secretRef":{"name":"fidasc-web-db"}},{"configMapRef":{"name":"vcf"}}],"image":"europe-west8-docker.pkg.dev/n-gke-fsn-prod-488511/repo-prod/joomla-common:0.4","imagePullPolicy":"IfNotPresent","livenessProbe":{"failureThreshold":3,"httpGet":{"path":"/administrator/","port":"http","scheme":"HTTP"},"initialDelaySeconds":15,"periodSeconds":30,"successThreshold":1,"timeoutSeconds":15},"name":"fidasc-web","ports":[{"containerPort":80,"name":"http","protocol":"TCP"}],"readinessProbe":{"failureThreshold":3,"httpGet":{"path":"/administrator/","port":"http","scheme":"HTTP"},"initialDelaySeconds":15,"periodSeconds":30,"successThreshold":1,"timeoutSeconds":15},"resources":{"limits":{"cpu":"1","ephemeral-storage":"1Gi","memory":"1024Mi"},"requests":{"cpu":"300m","ephemeral-storage":"1Gi","memory":"1024Mi"}},"securityContext":{"capabilities":{"add":["NET_RAW"]}},"volumeMounts":[{"mountPath":"/var/www/html/app","name":"fidasc-web-docroot"}]}],"volumes":[{"name":"fidasc-web-docroot","persistentVolumeClaim":{"claimName":"fidasc-web-docroot"}}]}}}}
+  creationTimestamp: "2026-05-13T13:05:05Z"
+  generation: 56
+  name: fidasc-web
+  namespace: default
+  resourceVersion: "1783074547600271023"
+  uid: 68562cd1-db8a-4ec8-ab8f-bb79a9be6b91
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: fidasc-web
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: fidasc-web
+    spec:
+      containers:
+      - env:
+        - name: DB_HOST
+          value: 10.170.76.24
+        - name: DB_SCHEMA
+          value: web_rest_fidasc
+        envFrom:
+        - secretRef:
+            name: sendgrid-smtp
+        - secretRef:
+            name: fidasc-web-db
+        - configMapRef:
+            name: vcf
+        image: europe-west8-docker.pkg.dev/n-gke-fsn-prod-488511/repo-prod/joomla-common:0.4
+        imagePullPolicy: IfNotPresent
+        livenessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /administrator/
+            port: http
+            scheme: HTTP
+          initialDelaySeconds: 15
+          periodSeconds: 30
+          successThreshold: 1
+          timeoutSeconds: 15
+        name: fidasc-web
+        ports:
+        - containerPort: 80
+          name: http
+          protocol: TCP
+        readinessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /administrator/
+            port: http
+            scheme: HTTP
+          initialDelaySeconds: 15
+          periodSeconds: 30
+          successThreshold: 1
+          timeoutSeconds: 15
+        resources:
+          limits:
+            cpu: "1"
+            ephemeral-storage: 1Gi
+            memory: 1Gi
+          requests:
+            cpu: 300m
+            ephemeral-storage: 1Gi
+            memory: 1Gi
+        securityContext:
+          capabilities:
+            add:
+            - NET_RAW
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /var/www/html/app
+          name: fidasc-web-docroot
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - name: fidasc-web-docroot
+        persistentVolumeClaim:
+          claimName: fidasc-web-docroot
+status:
+  availableReplicas: 1
+  conditions:
+  - lastTransitionTime: "2026-05-21T08:27:18Z"
+    lastUpdateTime: "2026-06-23T16:01:49Z"
+    message: ReplicaSet "fidasc-web-5b4f4d5dd9" has successfully progressed.
+    reason: NewReplicaSetAvailable
+    status: "True"
+    type: Progressing
+  - lastTransitionTime: "2026-07-03T10:23:54Z"
+    lastUpdateTime: "2026-07-03T10:23:54Z"
+    message: Deployment has minimum availability.
+    reason: MinimumReplicasAvailable
+    status: "True"
+    type: Available
+  observedGeneration: 56
+  readyReplicas: 1
+  replicas: 1
+  terminatingReplicas: 0
+  updatedReplicas: 1

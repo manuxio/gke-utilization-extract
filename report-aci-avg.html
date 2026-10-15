@@ -1,0 +1,213 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GKE utilization report — aci</title>
+<style>
+  :root{ --fg:#1a1d24; --muted:#6b7280; --line:#e3e6eb; --bg:#fff; --accent:#2563eb;
+         --down:#0f766e; --downbg:#d1faf3; --up:#b42318; --upbg:#fee4e2; --keep:#525252; --keepbg:#eef0f3; }
+  *{ box-sizing:border-box; }
+  body{ font:14px/1.5 -apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif; color:var(--fg); background:var(--bg); margin:0; padding:32px; }
+  header{ border-bottom:2px solid var(--line); padding-bottom:16px; margin-bottom:24px; }
+  h1{ font-size:22px; margin:0 0 6px; }
+  h2{ font-size:18px; margin:0 0 4px; }
+  h3{ font-size:13px; text-transform:uppercase; letter-spacing:.04em; color:var(--muted); margin:20px 0 8px; }
+  .sub{ color:var(--muted); font-size:12.5px; }
+  .method{ background:#f7f8fa; border:1px solid var(--line); border-radius:8px; padding:12px 14px; margin-top:14px; font-size:12.5px; color:#374151; }
+  .method code{ background:#eef0f3; padding:1px 5px; border-radius:4px; }
+  section.app{ border:1px solid var(--line); border-radius:10px; padding:18px 20px; margin-bottom:22px; }
+  .apply{ font-size:12.5px; color:#374151; margin:2px 0 6px; }
+  .apply code{ background:#eef0f3; padding:1px 5px; border-radius:4px; }
+  .chips{ margin:2px 0 12px; }
+  .chip{ display:inline-block; background:#f0f2f5; color:#374151; border-radius:999px; padding:2px 10px; margin:0 6px 6px 0; font-size:12px; }
+  table{ border-collapse:collapse; width:100%; margin:6px 0 4px; }
+  th,td{ text-align:left; padding:7px 10px; border-bottom:1px solid var(--line); font-size:13px; vertical-align:middle; }
+  th{ color:var(--muted); font-weight:600; font-size:12px; }
+  th.num{ text-align:right; }
+  td.num{ text-align:right; font-variant-numeric:tabular-nums; }
+  td.strong,.strong{ font-weight:700; }
+  .muted{ color:var(--muted); }
+  .badge{ display:inline-block; border-radius:6px; padding:2px 8px; font-weight:700; font-size:12.5px; font-variant-numeric:tabular-nums; }
+  .badge.down{ color:var(--down); background:var(--downbg); }
+  .badge.up{ color:var(--up); background:var(--upbg); }
+  .badge.keep{ color:var(--keep); background:var(--keepbg); }
+  .badge.muted{ color:var(--muted); background:var(--keepbg); }
+  footer{ color:var(--muted); font-size:12px; margin-top:20px; border-top:1px solid var(--line); padding-top:12px; }
+  .toolbar{ position:sticky; top:0; z-index:10; background:var(--bg); border-bottom:1px solid var(--line);
+            padding:12px 0; margin-bottom:18px; display:flex; flex-wrap:wrap; gap:10px 12px; align-items:center; }
+  .toolbar input[type=search]{ padding:7px 10px; border:1px solid var(--line); border-radius:8px; font:inherit; min-width:200px; }
+  .cats{ display:flex; flex-wrap:wrap; gap:6px; }
+  .cats button{ font:inherit; font-size:12.5px; padding:5px 11px; border:1px solid var(--line); background:#f7f8fa;
+                color:#374151; border-radius:999px; cursor:pointer; }
+  .cats button:hover{ background:#eef0f3; }
+  .cats button.active{ background:var(--accent); border-color:var(--accent); color:#fff; }
+  .cats button .c{ opacity:.65; font-variant-numeric:tabular-nums; margin-left:3px; }
+  .cats button.active .c{ opacity:.9; }
+  .count{ color:var(--muted); font-size:12.5px; margin-left:auto; white-space:nowrap; }
+  .empty{ display:none; color:var(--muted); text-align:center; padding:36px 0; }
+  @media print{
+    body{ padding:0; }
+    .toolbar{ display:none !important; }
+    section.app{ break-inside:avoid; page-break-inside:avoid; display:block !important; }
+    @page{ size:A4; margin:14mm; }
+  }
+</style>
+</head><body>
+<header>
+  <h1>GKE container right-sizing report</h1>
+  <div class="sub">Source: <code>gke-utilization-2026-07-03.csv</code> · apps: aci · generated 2026-07-03T13:47:10.423Z</div>
+  <div class="method">
+    <strong>Method.</strong> Per app, pods are combined with <code>agg=avg</code>
+    (values AVERAGED across pods at each timestamp — per-replica view).
+    <code>low</code> is the smallest value still &gt; 0; <code>p90/p95/high</code> use the nearest-rank method over the combined series.
+    <strong>Suggested sizing</strong> = basis ÷ target, as a % of the current configured value:
+    request uses <code>p95</code> with target <code>0.8</code>;
+    limit uses <code>peak</code> with target <code>0.9</code>.
+    <span class="muted">Utilization is a per-pod ratio, so <code>avg</code>/<code>pool</code> map directly to per-pod sizing;
+    <code>sum</code> inflates by the concurrent replica count.</span>
+    <br><strong>To set YAML:</strong> current values were read from <code>yaml/&lt;app&gt;.yaml</code>, so the <em>suggested</em> column holds absolute values ready to paste (<code>suggested = used ÷ target × current</code>). A machine-readable table is written alongside as <code>report-aci-avg.apply.csv</code>.
+    <br><span class="muted">Caveat: memory is incompressible — the "peak" here is the max over the 2026-06-26T12:33:00.000Z…2026-07-03T12:32:00.000Z window; leave extra headroom on memory limits to avoid OOMKills.</span>
+  </div>
+</header>
+<div class="toolbar">
+  <input id="nameFilter" type="search" placeholder="Filter app name…" autocomplete="off" spellcheck="false">
+  <div class="cats" id="cats">
+    <button data-cat="all" class="active">All</button>
+    <button data-cat="under-reserved">Under-reserved · request &gt; 100%</button>
+    <button data-cat="over-limit">Over limit · limit &gt; 100%</button>
+    <button data-cat="severely-over-reserved">Severely over-reserved · ≤ 25%</button>
+    <button data-cat="over-reserved">Over-reserved · &lt; 80%</button>
+    <button data-cat="no-limits">No limits set</button>
+    <button data-cat="no-data">No data</button>
+  </div>
+  <span class="count" id="count"></span>
+</div>
+<section class="app" data-app="aci" data-flags="severely-over-reserved over-reserved">
+    <h2>aci</h2>
+    <div class="chips">
+      <span class="chip">container: aci</span>
+      <span class="chip">replicas: 1</span>
+      <span class="chip">pods: 2</span>
+      <span class="chip">points: 60,482</span>
+      <span class="chip">window: 2026-06-26T12:33:00.000Z → 2026-07-03T12:32:00.000Z</span>
+      <span class="chip">agg: avg</span>
+    </div>
+
+    <table class="stats">
+      <thead><tr><th>Metric</th><th class="num">low&nbsp;(&gt;0)</th><th class="num">p90</th><th class="num">p95</th><th class="num">high</th><th class="num">points</th></tr></thead>
+      <tbody><tr>
+      <td>CPU request utilization</td>
+      <td class="num">1.2%</td>
+      <td class="num">9.5%</td>
+      <td class="num strong">10.2%</td>
+      <td class="num">53.6%</td>
+      <td class="num muted">10,078</td>
+    </tr><tr>
+      <td>CPU limit utilization</td>
+      <td class="num">0.2%</td>
+      <td class="num">1.9%</td>
+      <td class="num strong">2.0%</td>
+      <td class="num">10.7%</td>
+      <td class="num muted">10,080</td>
+    </tr><tr>
+      <td>Memory request utilization</td>
+      <td class="num">5.9%</td>
+      <td class="num">12.3%</td>
+      <td class="num strong">12.6%</td>
+      <td class="num">12.8%</td>
+      <td class="num muted">10,080</td>
+    </tr><tr>
+      <td>Memory limit utilization</td>
+      <td class="num">5.9%</td>
+      <td class="num">12.3%</td>
+      <td class="num strong">12.6%</td>
+      <td class="num">12.8%</td>
+      <td class="num muted">10,080</td>
+    </tr></tbody>
+    </table>
+
+    <h3>Current vs suggested — values to set in the manifest</h3>
+    <div class="apply">Container <code>aci</code> · deployment <code>aci</code>. Suggested = observed usage (p95 for requests, peak for limits) ÷ target headroom; limit clamped ≥ request.</div>
+    <table class="rec">
+      <thead><tr>
+        <th>Resource</th>
+        <th class="num">current</th>
+        <th class="num">used<br><span class="muted">p95 / peak</span></th>
+        <th class="num">vs current</th>
+        <th class="num">suggested</th>
+      </tr></thead>
+      <tbody><tr>
+      <td class="strong">CPU request</td>
+      <td class="num">100m</td>
+      <td class="num">10.2%</td>
+      <td class="num"><span class="badge down">▼ 13%</span></td>
+      <td class="num"><span class="strong">15m</span></td>
+    </tr><tr>
+      <td class="strong">CPU limit</td>
+      <td class="num">500m</td>
+      <td class="num">10.7%</td>
+      <td class="num"><span class="badge down">▼ 12%</span></td>
+      <td class="num"><span class="strong">60m</span></td>
+    </tr><tr>
+      <td class="strong">Memory request</td>
+      <td class="num">256Mi</td>
+      <td class="num">12.6%</td>
+      <td class="num"><span class="badge down">▼ 16%</span></td>
+      <td class="num"><span class="strong">48Mi</span></td>
+    </tr><tr>
+      <td class="strong">Memory limit</td>
+      <td class="num">256Mi</td>
+      <td class="num">12.8%</td>
+      <td class="num"><span class="badge down">▼ 14%</span></td>
+      <td class="num"><span class="strong">48Mi</span></td>
+    </tr></tbody>
+    </table>
+  </section>
+<div class="empty" id="empty">No apps match the current filter.</div>
+<footer>Generated by analyze-utilization · 1 app(s) · nearest-rank percentiles · values shown as % (ratio×100).</footer>
+<script>
+(function () {
+  var sections = Array.prototype.slice.call(document.querySelectorAll('section.app'));
+  var nameInput = document.getElementById('nameFilter');
+  var cats = document.getElementById('cats');
+  var countEl = document.getElementById('count');
+  var emptyEl = document.getElementById('empty');
+  var buttons = Array.prototype.slice.call(cats.querySelectorAll('button'));
+  var activeCat = 'all';
+
+  function flagsOf(s) { return (s.dataset.flags || '').split(' ').filter(Boolean); }
+
+  // Annotate each category button with how many apps carry it.
+  buttons.forEach(function (b) {
+    var cat = b.dataset.cat;
+    var n = cat === 'all' ? sections.length : sections.filter(function (s) { return flagsOf(s).indexOf(cat) >= 0; }).length;
+    b.insertAdjacentHTML('beforeend', ' <span class="c">' + n + '</span>');
+    if (cat !== 'all' && n === 0) { b.disabled = true; b.style.opacity = 0.4; b.style.cursor = 'default'; }
+  });
+
+  function apply() {
+    var q = nameInput.value.trim().toLowerCase();
+    var shown = 0;
+    sections.forEach(function (s) {
+      var okName = !q || (s.dataset.app || '').toLowerCase().indexOf(q) >= 0;
+      var okCat = activeCat === 'all' || flagsOf(s).indexOf(activeCat) >= 0;
+      var show = okName && okCat;
+      s.style.display = show ? '' : 'none';
+      if (show) shown++;
+    });
+    countEl.textContent = 'showing ' + shown + ' of ' + sections.length;
+    emptyEl.style.display = shown ? 'none' : 'block';
+  }
+
+  nameInput.addEventListener('input', apply);
+  cats.addEventListener('click', function (e) {
+    var b = e.target.closest('button');
+    if (!b || b.disabled) return;
+    activeCat = b.dataset.cat;
+    buttons.forEach(function (x) { x.classList.toggle('active', x === b); });
+    apply();
+  });
+  apply();
+})();
+</script>
+</body></html>

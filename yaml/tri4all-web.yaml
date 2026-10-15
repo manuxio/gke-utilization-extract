@@ -1,0 +1,125 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    deployment.kubernetes.io/revision: "3"
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{},"name":"tri4all-web","namespace":"default"},"spec":{"replicas":1,"selector":{"matchLabels":{"app":"tri4all-web"}},"template":{"metadata":{"labels":{"app":"tri4all-web"}},"spec":{"containers":[{"env":[{"name":"APPLICATIVO","value":"tri4all"},{"name":"DB_HOST","value":"10.170.76.26"},{"name":"DB_SCHEMA","value":"web_tri4all"}],"envFrom":[{"secretRef":{"name":"sendgrid-smtp"}}],"image":"europe-west8-docker.pkg.dev/n-gke-fsn-prod-488511/repo-prod/joomla-common-php8-1-27-iti-log:0.1","imagePullPolicy":"IfNotPresent","livenessProbe":{"failureThreshold":3,"httpGet":{"path":"/administrator/","port":"http","scheme":"HTTP"},"initialDelaySeconds":15,"periodSeconds":30,"successThreshold":1,"timeoutSeconds":15},"name":"tri4all-web","ports":[{"containerPort":80,"name":"http","protocol":"TCP"}],"readinessProbe":{"failureThreshold":3,"httpGet":{"path":"/administrator/","port":"http","scheme":"HTTP"},"initialDelaySeconds":15,"periodSeconds":30,"successThreshold":1,"timeoutSeconds":15},"resources":{"limits":{"cpu":"1","ephemeral-storage":"1Gi","memory":"1024Mi"},"requests":{"cpu":"300m","ephemeral-storage":"1Gi","memory":"512Mi"}},"securityContext":{"capabilities":{"add":["NET_RAW"]}},"volumeMounts":[{"mountPath":"/var/www/html/app","name":"tri4all-web-docroot"},{"mountPath":"/etc/apache2/sites-available","name":"tri4all-web-sitesavailable"},{"mountPath":"/etc/apache2/sites-enabled","name":"tri4all-web-sitesenabled"}]}],"volumes":[{"name":"tri4all-web-docroot","persistentVolumeClaim":{"claimName":"tri4all-web-docroot"}},{"name":"tri4all-web-sitesavailable","persistentVolumeClaim":{"claimName":"tri4all-web-sitesavailable"}},{"name":"tri4all-web-sitesenabled","persistentVolumeClaim":{"claimName":"tri4all-web-sitesenabled"}}]}}}}
+  creationTimestamp: "2026-04-16T13:58:21Z"
+  generation: 5
+  name: tri4all-web
+  namespace: default
+  resourceVersion: "1783081602391711014"
+  uid: 43b5119d-5e61-4371-a0fc-3b6aec08922b
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: tri4all-web
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: tri4all-web
+    spec:
+      containers:
+      - env:
+        - name: APPLICATIVO
+          value: tri4all
+        - name: DB_HOST
+          value: 10.170.76.26
+        - name: DB_SCHEMA
+          value: web_tri4all
+        envFrom:
+        - secretRef:
+            name: sendgrid-smtp
+        image: europe-west8-docker.pkg.dev/n-gke-fsn-prod-488511/repo-prod/joomla-common-php8-1-27-iti-log:0.1
+        imagePullPolicy: IfNotPresent
+        livenessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /administrator/
+            port: http
+            scheme: HTTP
+          initialDelaySeconds: 15
+          periodSeconds: 30
+          successThreshold: 1
+          timeoutSeconds: 15
+        name: tri4all-web
+        ports:
+        - containerPort: 80
+          name: http
+          protocol: TCP
+        readinessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /administrator/
+            port: http
+            scheme: HTTP
+          initialDelaySeconds: 15
+          periodSeconds: 30
+          successThreshold: 1
+          timeoutSeconds: 15
+        resources:
+          limits:
+            cpu: "1"
+            ephemeral-storage: 1Gi
+            memory: 1Gi
+          requests:
+            cpu: 300m
+            ephemeral-storage: 1Gi
+            memory: 512Mi
+        securityContext:
+          capabilities:
+            add:
+            - NET_RAW
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /var/www/html/app
+          name: tri4all-web-docroot
+        - mountPath: /etc/apache2/sites-available
+          name: tri4all-web-sitesavailable
+        - mountPath: /etc/apache2/sites-enabled
+          name: tri4all-web-sitesenabled
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - name: tri4all-web-docroot
+        persistentVolumeClaim:
+          claimName: tri4all-web-docroot
+      - name: tri4all-web-sitesavailable
+        persistentVolumeClaim:
+          claimName: tri4all-web-sitesavailable
+      - name: tri4all-web-sitesenabled
+        persistentVolumeClaim:
+          claimName: tri4all-web-sitesenabled
+status:
+  availableReplicas: 1
+  conditions:
+  - lastTransitionTime: "2026-05-19T07:31:35Z"
+    lastUpdateTime: "2026-06-23T16:03:02Z"
+    message: ReplicaSet "tri4all-web-7774b9f4ff" has successfully progressed.
+    reason: NewReplicaSetAvailable
+    status: "True"
+    type: Progressing
+  - lastTransitionTime: "2026-07-03T12:26:42Z"
+    lastUpdateTime: "2026-07-03T12:26:42Z"
+    message: Deployment has minimum availability.
+    reason: MinimumReplicasAvailable
+    status: "True"
+    type: Available
+  observedGeneration: 5
+  readyReplicas: 1
+  replicas: 1
+  terminatingReplicas: 0
+  updatedReplicas: 1

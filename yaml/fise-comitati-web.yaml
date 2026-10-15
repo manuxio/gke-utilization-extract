@@ -1,0 +1,119 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    deployment.kubernetes.io/revision: "5"
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{},"name":"fise-comitati-web","namespace":"default"},"spec":{"replicas":2,"selector":{"matchLabels":{"app":"fise-comitati-web"}},"template":{"metadata":{"labels":{"app":"fise-comitati-web"}},"spec":{"containers":[{"env":[{"name":"APPLICATIVO","value":"FISE_COMITATI"},{"name":"DB_HOST","value":"10.170.76.24"},{"name":"DB_SCHEMA","value":"rest_fise_comitati"}],"envFrom":[{"secretRef":{"name":"sendgrid-smtp"}},{"secretRef":{"name":"fise-comitati-web-db"}},{"configMapRef":{"name":"vcf"}}],"image":"europe-west8-docker.pkg.dev/n-gke-fsn-prod-488511/repo-prod/joomla-common-php5:0.9","imagePullPolicy":"IfNotPresent","livenessProbe":{"failureThreshold":5,"httpGet":{"path":"/administrator/","port":"http","scheme":"HTTP"},"initialDelaySeconds":15,"periodSeconds":30,"successThreshold":1,"timeoutSeconds":15},"name":"fise-comitati-web","ports":[{"containerPort":80,"name":"http","protocol":"TCP"}],"readinessProbe":{"failureThreshold":5,"httpGet":{"path":"/administrator/","port":"http","scheme":"HTTP"},"initialDelaySeconds":15,"periodSeconds":30,"successThreshold":1,"timeoutSeconds":15},"resources":{"limits":{"cpu":"1","ephemeral-storage":"1Gi","memory":"6Gi"},"requests":{"cpu":"500m","ephemeral-storage":"1Gi","memory":"4Gi"}},"securityContext":{"capabilities":{"add":["NET_RAW"]}},"volumeMounts":[{"mountPath":"/var/www/html/app","name":"fise-comitati-web-docroot"}]}],"volumes":[{"name":"fise-comitati-web-docroot","persistentVolumeClaim":{"claimName":"fise-comitati-web-docroot"}}]}}}}
+  creationTimestamp: "2026-05-13T13:05:32Z"
+  generation: 550
+  name: fise-comitati-web
+  namespace: default
+  resourceVersion: "1783085222013999015"
+  uid: 842eb425-2fe8-4877-a8ee-256ae2f2688f
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 6
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: fise-comitati-web
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: fise-comitati-web
+    spec:
+      containers:
+      - env:
+        - name: APPLICATIVO
+          value: FISE_COMITATI
+        - name: DB_HOST
+          value: 10.170.76.24
+        - name: DB_SCHEMA
+          value: rest_fise_comitati
+        envFrom:
+        - secretRef:
+            name: sendgrid-smtp
+        - secretRef:
+            name: fise-comitati-web-db
+        - configMapRef:
+            name: vcf
+        image: europe-west8-docker.pkg.dev/n-gke-fsn-prod-488511/repo-prod/joomla-common-php5:0.9
+        imagePullPolicy: IfNotPresent
+        livenessProbe:
+          failureThreshold: 5
+          httpGet:
+            path: /administrator/
+            port: http
+            scheme: HTTP
+          initialDelaySeconds: 15
+          periodSeconds: 30
+          successThreshold: 1
+          timeoutSeconds: 15
+        name: fise-comitati-web
+        ports:
+        - containerPort: 80
+          name: http
+          protocol: TCP
+        readinessProbe:
+          failureThreshold: 5
+          httpGet:
+            path: /administrator/
+            port: http
+            scheme: HTTP
+          initialDelaySeconds: 15
+          periodSeconds: 30
+          successThreshold: 1
+          timeoutSeconds: 15
+        resources:
+          limits:
+            cpu: "1"
+            ephemeral-storage: 1Gi
+            memory: 6Gi
+          requests:
+            cpu: 500m
+            ephemeral-storage: 1Gi
+            memory: 4Gi
+        securityContext:
+          capabilities:
+            add:
+            - NET_RAW
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /var/www/html/app
+          name: fise-comitati-web-docroot
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - name: fise-comitati-web-docroot
+        persistentVolumeClaim:
+          claimName: fise-comitati-web-docroot
+status:
+  availableReplicas: 6
+  conditions:
+  - lastTransitionTime: "2026-05-20T13:31:59Z"
+    lastUpdateTime: "2026-06-30T07:37:52Z"
+    message: ReplicaSet "fise-comitati-web-779bbbf488" has successfully progressed.
+    reason: NewReplicaSetAvailable
+    status: "True"
+    type: Progressing
+  - lastTransitionTime: "2026-07-03T11:01:09Z"
+    lastUpdateTime: "2026-07-03T11:01:09Z"
+    message: Deployment has minimum availability.
+    reason: MinimumReplicasAvailable
+    status: "True"
+    type: Available
+  observedGeneration: 550
+  readyReplicas: 6
+  replicas: 6
+  terminatingReplicas: 0
+  updatedReplicas: 6

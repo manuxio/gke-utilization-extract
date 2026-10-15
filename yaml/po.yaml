@@ -1,0 +1,117 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    deployment.kubernetes.io/revision: "3"
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{},"name":"po","namespace":"default"},"spec":{"replicas":1,"selector":{"matchLabels":{"app":"po"}},"template":{"metadata":{"labels":{"app":"po"}},"spec":{"containers":[{"env":[{"name":"DB_HOST","value":"10.170.76.24"},{"name":"DB_SCHEMA","value":"po"}],"envFrom":[{"secretRef":{"name":"sendgrid-smtp"}},{"secretRef":{"name":"po-db"}},{"secretRef":{"name":"po-read-db"}}],"image":"europe-west8-docker.pkg.dev/n-gke-fsn-prod-488511/repo-prod/po:latest","imagePullPolicy":"IfNotPresent","livenessProbe":{"failureThreshold":3,"httpGet":{"path":"/user/","port":"http","scheme":"HTTP"},"initialDelaySeconds":15,"periodSeconds":30,"successThreshold":1,"timeoutSeconds":15},"name":"po","ports":[{"containerPort":80,"name":"http","protocol":"TCP"}],"readinessProbe":{"failureThreshold":3,"httpGet":{"path":"/user/","port":"http","scheme":"HTTP"},"initialDelaySeconds":15,"periodSeconds":30,"successThreshold":1,"timeoutSeconds":15},"resources":{"limits":{"cpu":"500m","ephemeral-storage":"1Gi","memory":"512Mi"},"requests":{"cpu":"250m","ephemeral-storage":"1Gi","memory":"512Mi"}},"securityContext":{"capabilities":{"add":["NET_RAW"]}},"volumeMounts":[{"mountPath":"/var/DRUPALFILES/po_files","name":"po-files"}]}],"volumes":[{"name":"po-files","persistentVolumeClaim":{"claimName":"po-files"}}]}}}}
+  creationTimestamp: "2026-05-13T13:06:04Z"
+  generation: 4
+  name: po
+  namespace: default
+  resourceVersion: "1782602532218511021"
+  uid: 42b11e39-3642-49eb-a903-be211ed4edc1
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: po
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: po
+    spec:
+      containers:
+      - env:
+        - name: DB_HOST
+          value: 10.170.76.24
+        - name: DB_SCHEMA
+          value: po
+        envFrom:
+        - secretRef:
+            name: sendgrid-smtp
+        - secretRef:
+            name: po-db
+        - secretRef:
+            name: po-read-db
+        image: europe-west8-docker.pkg.dev/n-gke-fsn-prod-488511/repo-prod/po:latest
+        imagePullPolicy: IfNotPresent
+        livenessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /user/
+            port: http
+            scheme: HTTP
+          initialDelaySeconds: 15
+          periodSeconds: 30
+          successThreshold: 1
+          timeoutSeconds: 15
+        name: po
+        ports:
+        - containerPort: 80
+          name: http
+          protocol: TCP
+        readinessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /user/
+            port: http
+            scheme: HTTP
+          initialDelaySeconds: 15
+          periodSeconds: 30
+          successThreshold: 1
+          timeoutSeconds: 15
+        resources:
+          limits:
+            cpu: 500m
+            ephemeral-storage: 1Gi
+            memory: 512Mi
+          requests:
+            cpu: 250m
+            ephemeral-storage: 1Gi
+            memory: 512Mi
+        securityContext:
+          capabilities:
+            add:
+            - NET_RAW
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /var/DRUPALFILES/po_files
+          name: po-files
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - name: po-files
+        persistentVolumeClaim:
+          claimName: po-files
+status:
+  availableReplicas: 1
+  conditions:
+  - lastTransitionTime: "2026-05-19T07:30:53Z"
+    lastUpdateTime: "2026-06-23T16:03:14Z"
+    message: ReplicaSet "po-6fc4c57d64" has successfully progressed.
+    reason: NewReplicaSetAvailable
+    status: "True"
+    type: Progressing
+  - lastTransitionTime: "2026-06-27T23:22:12Z"
+    lastUpdateTime: "2026-06-27T23:22:12Z"
+    message: Deployment has minimum availability.
+    reason: MinimumReplicasAvailable
+    status: "True"
+    type: Available
+  observedGeneration: 4
+  readyReplicas: 1
+  replicas: 1
+  terminatingReplicas: 0
+  updatedReplicas: 1

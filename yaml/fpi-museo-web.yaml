@@ -1,0 +1,111 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    deployment.kubernetes.io/revision: "2"
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{},"name":"fpi-museo-web","namespace":"default"},"spec":{"replicas":1,"selector":{"matchLabels":{"app":"fpi-museo-web"}},"template":{"metadata":{"labels":{"app":"fpi-museo-web"}},"spec":{"containers":[{"env":[{"name":"DB_HOST","value":"10.170.76.24"},{"name":"DB_SCHEMA","value":"web_fpi_museo"}],"envFrom":[{"secretRef":{"name":"sendgrid-smtp"}},{"secretRef":{"name":"web-fpi-museo-db"}},{"configMapRef":{"name":"vcf"}}],"image":"europe-west8-docker.pkg.dev/n-gke-fsn-prod-488511/repo-prod/joomla-common-php5:0.1","imagePullPolicy":"IfNotPresent","livenessProbe":{"failureThreshold":3,"httpGet":{"path":"/","port":"http","scheme":"HTTP"},"initialDelaySeconds":15,"periodSeconds":30,"successThreshold":1,"timeoutSeconds":15},"name":"fpi-museo-web","ports":[{"containerPort":80,"name":"http","protocol":"TCP"}],"readinessProbe":{"failureThreshold":3,"httpGet":{"path":"/","port":"http","scheme":"HTTP"},"initialDelaySeconds":15,"periodSeconds":30,"successThreshold":1,"timeoutSeconds":15},"resources":{"limits":{"cpu":"500m","memory":"256Mi"},"requests":{"cpu":"100m","memory":"256Mi"}},"securityContext":{"capabilities":{"add":["NET_RAW"]}},"volumeMounts":[{"mountPath":"/var/www/html/app","name":"fpi-museo-web-docroot"}]}],"volumes":[{"name":"fpi-museo-web-docroot","persistentVolumeClaim":{"claimName":"fpi-museo-web-docroot"}}]}}}}
+  creationTimestamp: "2026-05-21T13:56:33Z"
+  generation: 4
+  name: fpi-museo-web
+  namespace: default
+  resourceVersion: "1782230626026735005"
+  uid: d8b8ac94-a14b-4314-a42b-83fb9dd91957
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 0
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: fpi-museo-web
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: fpi-museo-web
+    spec:
+      containers:
+      - env:
+        - name: DB_HOST
+          value: 10.170.76.24
+        - name: DB_SCHEMA
+          value: web_fpi_museo
+        envFrom:
+        - secretRef:
+            name: sendgrid-smtp
+        - secretRef:
+            name: web-fpi-museo-db
+        - configMapRef:
+            name: vcf
+        image: europe-west8-docker.pkg.dev/n-gke-fsn-prod-488511/repo-prod/joomla-common-php5:0.1
+        imagePullPolicy: IfNotPresent
+        livenessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /
+            port: http
+            scheme: HTTP
+          initialDelaySeconds: 15
+          periodSeconds: 30
+          successThreshold: 1
+          timeoutSeconds: 15
+        name: fpi-museo-web
+        ports:
+        - containerPort: 80
+          name: http
+          protocol: TCP
+        readinessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /
+            port: http
+            scheme: HTTP
+          initialDelaySeconds: 15
+          periodSeconds: 30
+          successThreshold: 1
+          timeoutSeconds: 15
+        resources:
+          limits:
+            cpu: 500m
+            memory: 256Mi
+          requests:
+            cpu: 100m
+            memory: 256Mi
+        securityContext:
+          capabilities:
+            add:
+            - NET_RAW
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /var/www/html/app
+          name: fpi-museo-web-docroot
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - name: fpi-museo-web-docroot
+        persistentVolumeClaim:
+          claimName: fpi-museo-web-docroot
+status:
+  conditions:
+  - lastTransitionTime: "2026-06-23T16:03:41Z"
+    lastUpdateTime: "2026-06-23T16:03:41Z"
+    message: Deployment has minimum availability.
+    reason: MinimumReplicasAvailable
+    status: "True"
+    type: Available
+  - lastTransitionTime: "2026-05-21T13:56:33Z"
+    lastUpdateTime: "2026-06-23T16:03:42Z"
+    message: ReplicaSet "fpi-museo-web-74c79dd77c" has successfully progressed.
+    reason: NewReplicaSetAvailable
+    status: "True"
+    type: Progressing
+  observedGeneration: 4
+  terminatingReplicas: 0

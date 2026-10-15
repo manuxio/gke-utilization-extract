@@ -1,0 +1,95 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    deployment.kubernetes.io/revision: "1"
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{},"name":"progettifitarco-wp-web","namespace":"default"},"spec":{"replicas":1,"selector":{"matchLabels":{"app":"progettifitarco-wp-web"}},"template":{"metadata":{"labels":{"app":"progettifitarco-wp-web"}},"spec":{"containers":[{"image":"europe-west8-docker.pkg.dev/n-gke-fsn-prod-488511/repo-prod/wp-php-7-4:0.19","imagePullPolicy":"IfNotPresent","name":"progettifitarco-wp-web","ports":[{"containerPort":80,"name":"http","protocol":"TCP"}],"resources":{"limits":{"cpu":"500m","ephemeral-storage":"1Gi","memory":"256Mi"},"requests":{"cpu":"100m","ephemeral-storage":"1Gi","memory":"256Mi"}},"securityContext":{"capabilities":{"add":["NET_RAW"]}},"volumeMounts":[{"mountPath":"/var/www/html","name":"progettifitarco-wp-web-docroot"},{"mountPath":"/etc/apache2/sites-available","name":"progettifitarco-wp-web-sitesavailable"},{"mountPath":"/etc/apache2/sites-enabled","name":"progettifitarco-wp-web-sitesenabled"}]}],"volumes":[{"name":"progettifitarco-wp-web-docroot","persistentVolumeClaim":{"claimName":"progettifitarco-wp-web-docroot"}},{"name":"progettifitarco-wp-web-sitesavailable","persistentVolumeClaim":{"claimName":"progettifitarco-wp-web-sitesavailable"}},{"name":"progettifitarco-wp-web-sitesenabled","persistentVolumeClaim":{"claimName":"progettifitarco-wp-web-sitesenabled"}}]}}}}
+  creationTimestamp: "2026-05-13T13:06:05Z"
+  generation: 2
+  name: progettifitarco-wp-web
+  namespace: default
+  resourceVersion: "1782602501269359004"
+  uid: 733d771e-727f-44c6-a947-c6650db82d17
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: progettifitarco-wp-web
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: progettifitarco-wp-web
+    spec:
+      containers:
+      - image: europe-west8-docker.pkg.dev/n-gke-fsn-prod-488511/repo-prod/wp-php-7-4:0.19
+        imagePullPolicy: IfNotPresent
+        name: progettifitarco-wp-web
+        ports:
+        - containerPort: 80
+          name: http
+          protocol: TCP
+        resources:
+          limits:
+            cpu: 500m
+            ephemeral-storage: 1Gi
+            memory: 256Mi
+          requests:
+            cpu: 100m
+            ephemeral-storage: 1Gi
+            memory: 256Mi
+        securityContext:
+          capabilities:
+            add:
+            - NET_RAW
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /var/www/html
+          name: progettifitarco-wp-web-docroot
+        - mountPath: /etc/apache2/sites-available
+          name: progettifitarco-wp-web-sitesavailable
+        - mountPath: /etc/apache2/sites-enabled
+          name: progettifitarco-wp-web-sitesenabled
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - name: progettifitarco-wp-web-docroot
+        persistentVolumeClaim:
+          claimName: progettifitarco-wp-web-docroot
+      - name: progettifitarco-wp-web-sitesavailable
+        persistentVolumeClaim:
+          claimName: progettifitarco-wp-web-sitesavailable
+      - name: progettifitarco-wp-web-sitesenabled
+        persistentVolumeClaim:
+          claimName: progettifitarco-wp-web-sitesenabled
+status:
+  availableReplicas: 1
+  conditions:
+  - lastTransitionTime: "2026-05-19T07:30:28Z"
+    lastUpdateTime: "2026-05-19T07:31:11Z"
+    message: ReplicaSet "progettifitarco-wp-web-d5c6454c7" has successfully progressed.
+    reason: NewReplicaSetAvailable
+    status: "True"
+    type: Progressing
+  - lastTransitionTime: "2026-06-27T23:21:41Z"
+    lastUpdateTime: "2026-06-27T23:21:41Z"
+    message: Deployment has minimum availability.
+    reason: MinimumReplicasAvailable
+    status: "True"
+    type: Available
+  observedGeneration: 2
+  readyReplicas: 1
+  replicas: 1
+  terminatingReplicas: 0
+  updatedReplicas: 1

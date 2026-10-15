@@ -1,0 +1,119 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    deployment.kubernetes.io/revision: "4"
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{},"name":"piazzadisiena-web","namespace":"default"},"spec":{"replicas":1,"selector":{"matchLabels":{"app":"piazzadisiena-web"}},"template":{"metadata":{"labels":{"app":"piazzadisiena-web"}},"spec":{"containers":[{"env":[{"name":"DB_HOST","value":"10.170.76.26"},{"name":"DB_SCHEMA","value":"web_piazzadisiena"}],"envFrom":[{"secretRef":{"name":"sendgrid-smtp"}},{"secretRef":{"name":"piazzadisiena-web-db"}},{"configMapRef":{"name":"vcf"}}],"image":"europe-west8-docker.pkg.dev/n-gke-fsn-prod-488511/repo-prod/joomla-common:0.4","imagePullPolicy":"IfNotPresent","livenessProbe":{"failureThreshold":3,"httpGet":{"path":"/administrator/","port":"http","scheme":"HTTP"},"initialDelaySeconds":15,"periodSeconds":30,"successThreshold":1,"timeoutSeconds":15},"name":"piazzadisiena-web","ports":[{"containerPort":80,"name":"http","protocol":"TCP"}],"readinessProbe":{"failureThreshold":3,"httpGet":{"path":"/administrator/","port":"http","scheme":"HTTP"},"initialDelaySeconds":15,"periodSeconds":30,"successThreshold":1,"timeoutSeconds":15},"resources":{"limits":{"cpu":"500m","ephemeral-storage":"1Gi","memory":"256Mi"},"requests":{"cpu":"100m","ephemeral-storage":"1Gi","memory":"256Mi"}},"securityContext":{"capabilities":{"add":["NET_RAW"]}},"volumeMounts":[{"mountPath":"/var/www/html/app","name":"piazzadisiena-web-docroot"}]}],"volumes":[{"name":"piazzadisiena-web-docroot","persistentVolumeClaim":{"claimName":"piazzadisiena-web-docroot"}}]}}}}
+  creationTimestamp: "2026-05-13T13:06:03Z"
+  generation: 7
+  name: piazzadisiena-web
+  namespace: default
+  resourceVersion: "1783081607719311012"
+  uid: 4fecd7d1-f821-4c11-a6b8-754740a9c49c
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: piazzadisiena-web
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      annotations:
+        kubectl.kubernetes.io/restartedAt: "2026-05-20T11:00:26Z"
+      labels:
+        app: piazzadisiena-web
+    spec:
+      containers:
+      - env:
+        - name: DB_HOST
+          value: 10.170.76.26
+        - name: DB_SCHEMA
+          value: web_piazzadisiena
+        envFrom:
+        - secretRef:
+            name: sendgrid-smtp
+        - secretRef:
+            name: piazzadisiena-web-db
+        - configMapRef:
+            name: vcf
+        image: europe-west8-docker.pkg.dev/n-gke-fsn-prod-488511/repo-prod/joomla-common:0.4
+        imagePullPolicy: IfNotPresent
+        livenessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /administrator/
+            port: http
+            scheme: HTTP
+          initialDelaySeconds: 15
+          periodSeconds: 30
+          successThreshold: 1
+          timeoutSeconds: 15
+        name: piazzadisiena-web
+        ports:
+        - containerPort: 80
+          name: http
+          protocol: TCP
+        readinessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /administrator/
+            port: http
+            scheme: HTTP
+          initialDelaySeconds: 15
+          periodSeconds: 30
+          successThreshold: 1
+          timeoutSeconds: 15
+        resources:
+          limits:
+            cpu: 500m
+            ephemeral-storage: 1Gi
+            memory: 256Mi
+          requests:
+            cpu: 100m
+            ephemeral-storage: 1Gi
+            memory: 256Mi
+        securityContext:
+          capabilities:
+            add:
+            - NET_RAW
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /var/www/html/app
+          name: piazzadisiena-web-docroot
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - name: piazzadisiena-web-docroot
+        persistentVolumeClaim:
+          claimName: piazzadisiena-web-docroot
+status:
+  availableReplicas: 1
+  conditions:
+  - lastTransitionTime: "2026-05-20T10:52:17Z"
+    lastUpdateTime: "2026-06-23T16:03:00Z"
+    message: ReplicaSet "piazzadisiena-web-d78867c7c" has successfully progressed.
+    reason: NewReplicaSetAvailable
+    status: "True"
+    type: Progressing
+  - lastTransitionTime: "2026-07-03T12:26:47Z"
+    lastUpdateTime: "2026-07-03T12:26:47Z"
+    message: Deployment has minimum availability.
+    reason: MinimumReplicasAvailable
+    status: "True"
+    type: Available
+  observedGeneration: 7
+  readyReplicas: 1
+  replicas: 1
+  terminatingReplicas: 0
+  updatedReplicas: 1

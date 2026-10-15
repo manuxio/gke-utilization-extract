@@ -1,0 +1,119 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    deployment.kubernetes.io/revision: "3"
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{},"name":"federscherma-web","namespace":"default"},"spec":{"replicas":1,"selector":{"matchLabels":{"app":"federscherma-web"}},"template":{"metadata":{"labels":{"app":"federscherma-web"}},"spec":{"containers":[{"env":[{"name":"DB_HOST","value":"10.170.76.26"},{"name":"DB_SCHEMA","value":"web_federscherma"},{"name":"APPLICATIVO","value":"federscherma"}],"envFrom":[{"secretRef":{"name":"sendgrid-smtp"}},{"secretRef":{"name":"federscherma-web-db"}},{"configMapRef":{"name":"vcf"}}],"image":"europe-west8-docker.pkg.dev/n-gke-fsn-prod-488511/repo-prod/joomla-common:0.2","imagePullPolicy":"IfNotPresent","livenessProbe":{"failureThreshold":3,"httpGet":{"path":"/robots.txt","port":"http","scheme":"HTTP"},"initialDelaySeconds":15,"periodSeconds":30,"successThreshold":1,"timeoutSeconds":15},"name":"federscherma-web","ports":[{"containerPort":80,"name":"http","protocol":"TCP"}],"readinessProbe":{"failureThreshold":3,"httpGet":{"path":"/robots.txt","port":"http","scheme":"HTTP"},"initialDelaySeconds":15,"periodSeconds":30,"successThreshold":1,"timeoutSeconds":15},"resources":{"limits":{"cpu":"500m","ephemeral-storage":"1Gi","memory":"1024Mi"},"requests":{"cpu":"250m","ephemeral-storage":"1Gi","memory":"1024Mi"}},"securityContext":{"capabilities":{"add":["NET_RAW"]}},"volumeMounts":[{"mountPath":"/var/www/html/app","name":"federscherma-web-docroot"}]}],"volumes":[{"name":"federscherma-web-docroot","persistentVolumeClaim":{"claimName":"federscherma-web-docroot"}}]}}}}
+  creationTimestamp: "2026-05-13T13:04:51Z"
+  generation: 4
+  name: federscherma-web
+  namespace: default
+  resourceVersion: "1782602659800367007"
+  uid: ecd73a0d-107b-48eb-a828-5f1bb10396c2
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: federscherma-web
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: federscherma-web
+    spec:
+      containers:
+      - env:
+        - name: DB_HOST
+          value: 10.170.76.26
+        - name: DB_SCHEMA
+          value: web_federscherma
+        - name: APPLICATIVO
+          value: federscherma
+        envFrom:
+        - secretRef:
+            name: sendgrid-smtp
+        - secretRef:
+            name: federscherma-web-db
+        - configMapRef:
+            name: vcf
+        image: europe-west8-docker.pkg.dev/n-gke-fsn-prod-488511/repo-prod/joomla-common:0.2
+        imagePullPolicy: IfNotPresent
+        livenessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /robots.txt
+            port: http
+            scheme: HTTP
+          initialDelaySeconds: 15
+          periodSeconds: 30
+          successThreshold: 1
+          timeoutSeconds: 15
+        name: federscherma-web
+        ports:
+        - containerPort: 80
+          name: http
+          protocol: TCP
+        readinessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /robots.txt
+            port: http
+            scheme: HTTP
+          initialDelaySeconds: 15
+          periodSeconds: 30
+          successThreshold: 1
+          timeoutSeconds: 15
+        resources:
+          limits:
+            cpu: 500m
+            ephemeral-storage: 1Gi
+            memory: 1Gi
+          requests:
+            cpu: 250m
+            ephemeral-storage: 1Gi
+            memory: 1Gi
+        securityContext:
+          capabilities:
+            add:
+            - NET_RAW
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /var/www/html/app
+          name: federscherma-web-docroot
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - name: federscherma-web-docroot
+        persistentVolumeClaim:
+          claimName: federscherma-web-docroot
+status:
+  availableReplicas: 1
+  conditions:
+  - lastTransitionTime: "2026-05-13T13:04:51Z"
+    lastUpdateTime: "2026-06-23T16:01:36Z"
+    message: ReplicaSet "federscherma-web-6fb655f464" has successfully progressed.
+    reason: NewReplicaSetAvailable
+    status: "True"
+    type: Progressing
+  - lastTransitionTime: "2026-06-27T23:24:19Z"
+    lastUpdateTime: "2026-06-27T23:24:19Z"
+    message: Deployment has minimum availability.
+    reason: MinimumReplicasAvailable
+    status: "True"
+    type: Available
+  observedGeneration: 4
+  readyReplicas: 1
+  replicas: 1
+  terminatingReplicas: 0
+  updatedReplicas: 1

@@ -1,0 +1,119 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    deployment.kubernetes.io/revision: "4"
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{},"name":"fikbms-web","namespace":"default"},"spec":{"replicas":1,"selector":{"matchLabels":{"app":"fikbms-web"}},"template":{"metadata":{"labels":{"app":"fikbms-web"}},"spec":{"containers":[{"env":[{"name":"APPLICATIVO","value":"fikbms"},{"name":"DB_HOST","value":"10.170.76.26"},{"name":"DB_SCHEMA","value":"web_fikbms"}],"envFrom":[{"secretRef":{"name":"sendgrid-smtp"}},{"secretRef":{"name":"fikbms-web-db"}},{"configMapRef":{"name":"vcf"}}],"image":"europe-west8-docker.pkg.dev/n-gke-fsn-prod-488511/repo-prod/joomla-common:0.4","imagePullPolicy":"IfNotPresent","livenessProbe":{"failureThreshold":3,"httpGet":{"path":"/administrator/","port":"http","scheme":"HTTP"},"initialDelaySeconds":15,"periodSeconds":30,"successThreshold":1,"timeoutSeconds":15},"name":"fikbms-web","ports":[{"containerPort":80,"name":"http","protocol":"TCP"}],"readinessProbe":{"failureThreshold":3,"httpGet":{"path":"/administrator/","port":"http","scheme":"HTTP"},"initialDelaySeconds":15,"periodSeconds":30,"successThreshold":1,"timeoutSeconds":15},"resources":{"limits":{"cpu":"500m","ephemeral-storage":"1Gi","memory":"2Gi"},"requests":{"cpu":"250m","ephemeral-storage":"1Gi","memory":"1024Mi"}},"securityContext":{"capabilities":{"add":["NET_RAW"]}},"volumeMounts":[{"mountPath":"/var/www/html/app","name":"fikbms-web-docroot"}]}],"volumes":[{"name":"fikbms-web-docroot","persistentVolumeClaim":{"claimName":"fikbms-web-docroot"}}]}}}}
+  creationTimestamp: "2026-05-13T13:05:17Z"
+  generation: 137
+  name: fikbms-web
+  namespace: default
+  resourceVersion: "1783083473784687001"
+  uid: b87db549-0fcd-4ffc-9561-6296dcc4dd81
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: fikbms-web
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: fikbms-web
+    spec:
+      containers:
+      - env:
+        - name: APPLICATIVO
+          value: fikbms
+        - name: DB_HOST
+          value: 10.170.76.26
+        - name: DB_SCHEMA
+          value: web_fikbms
+        envFrom:
+        - secretRef:
+            name: sendgrid-smtp
+        - secretRef:
+            name: fikbms-web-db
+        - configMapRef:
+            name: vcf
+        image: europe-west8-docker.pkg.dev/n-gke-fsn-prod-488511/repo-prod/joomla-common:0.4
+        imagePullPolicy: IfNotPresent
+        livenessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /administrator/
+            port: http
+            scheme: HTTP
+          initialDelaySeconds: 15
+          periodSeconds: 30
+          successThreshold: 1
+          timeoutSeconds: 15
+        name: fikbms-web
+        ports:
+        - containerPort: 80
+          name: http
+          protocol: TCP
+        readinessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /administrator/
+            port: http
+            scheme: HTTP
+          initialDelaySeconds: 15
+          periodSeconds: 30
+          successThreshold: 1
+          timeoutSeconds: 15
+        resources:
+          limits:
+            cpu: 500m
+            ephemeral-storage: 1Gi
+            memory: 2Gi
+          requests:
+            cpu: 250m
+            ephemeral-storage: 1Gi
+            memory: 1Gi
+        securityContext:
+          capabilities:
+            add:
+            - NET_RAW
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /var/www/html/app
+          name: fikbms-web-docroot
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - name: fikbms-web-docroot
+        persistentVolumeClaim:
+          claimName: fikbms-web-docroot
+status:
+  availableReplicas: 1
+  conditions:
+  - lastTransitionTime: "2026-05-21T08:18:55Z"
+    lastUpdateTime: "2026-06-24T14:35:19Z"
+    message: ReplicaSet "fikbms-web-5b7759b499" has successfully progressed.
+    reason: NewReplicaSetAvailable
+    status: "True"
+    type: Progressing
+  - lastTransitionTime: "2026-07-03T12:52:47Z"
+    lastUpdateTime: "2026-07-03T12:52:47Z"
+    message: Deployment has minimum availability.
+    reason: MinimumReplicasAvailable
+    status: "True"
+    type: Available
+  observedGeneration: 137
+  readyReplicas: 1
+  replicas: 1
+  terminatingReplicas: 0
+  updatedReplicas: 1

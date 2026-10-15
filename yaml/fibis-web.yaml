@@ -1,0 +1,122 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    deployment.kubernetes.io/revision: "3"
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{},"name":"fibis-web","namespace":"default"},"spec":{"replicas":1,"selector":{"matchLabels":{"app":"fibis-web"}},"template":{"metadata":{"labels":{"app":"fibis-web"}},"spec":{"containers":[{"env":[{"name":"DB_HOST","value":"10.170.76.26"},{"name":"DB_SCHEMA","value":"web_fibis"},{"name":"APPLICATIVO","value":"fibis"}],"envFrom":[{"secretRef":{"name":"sendgrid-smtp"}},{"secretRef":{"name":"fibis-web-db"}},{"configMapRef":{"name":"vcf"}}],"image":"europe-west8-docker.pkg.dev/n-gke-fsn-prod-488511/repo-prod/joomla-common-php72-iti-log:0.1","imagePullPolicy":"IfNotPresent","livenessProbe":{"failureThreshold":3,"httpGet":{"path":"/administrator/","port":"http","scheme":"HTTP"},"initialDelaySeconds":15,"periodSeconds":30,"successThreshold":1,"timeoutSeconds":15},"name":"fibis-web","ports":[{"containerPort":80,"name":"http","protocol":"TCP"}],"readinessProbe":{"failureThreshold":3,"httpGet":{"path":"/administrator/","port":"http","scheme":"HTTP"},"initialDelaySeconds":15,"periodSeconds":30,"successThreshold":1,"timeoutSeconds":15},"resources":{"limits":{"cpu":"2","ephemeral-storage":"1Gi","memory":"4Gi"},"requests":{"cpu":"1","ephemeral-storage":"1Gi","memory":"2Gi"}},"securityContext":{"capabilities":{"add":["NET_RAW"]}},"volumeMounts":[{"mountPath":"/var/www/html/app","name":"fibis-web-docroot"},{"mountPath":"/var/www/html/app/locandine","name":"fibis-web-files"}]}],"volumes":[{"name":"fibis-web-docroot","persistentVolumeClaim":{"claimName":"fibis-web-docroot"}},{"name":"fibis-web-files","persistentVolumeClaim":{"claimName":"fibis-web-files"}}]}}}}
+  creationTimestamp: "2026-05-13T13:05:01Z"
+  generation: 5
+  name: fibis-web
+  namespace: default
+  resourceVersion: "1782667601912511019"
+  uid: 41c20c66-d488-427e-a640-d4dc2919a0e9
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 0
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: fibis-web
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      annotations:
+        kubectl.kubernetes.io/restartedAt: "2026-06-16T14:34:12Z"
+      labels:
+        app: fibis-web
+    spec:
+      containers:
+      - env:
+        - name: DB_HOST
+          value: 10.170.76.26
+        - name: DB_SCHEMA
+          value: web_fibis
+        - name: APPLICATIVO
+          value: fibis
+        envFrom:
+        - secretRef:
+            name: sendgrid-smtp
+        - secretRef:
+            name: fibis-web-db
+        - configMapRef:
+            name: vcf
+        image: europe-west8-docker.pkg.dev/n-gke-fsn-prod-488511/repo-prod/joomla-common-php72-iti-log:0.1
+        imagePullPolicy: IfNotPresent
+        livenessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /administrator/
+            port: http
+            scheme: HTTP
+          initialDelaySeconds: 15
+          periodSeconds: 30
+          successThreshold: 1
+          timeoutSeconds: 15
+        name: fibis-web
+        ports:
+        - containerPort: 80
+          name: http
+          protocol: TCP
+        readinessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /administrator/
+            port: http
+            scheme: HTTP
+          initialDelaySeconds: 15
+          periodSeconds: 30
+          successThreshold: 1
+          timeoutSeconds: 15
+        resources:
+          limits:
+            cpu: "2"
+            ephemeral-storage: 1Gi
+            memory: 4Gi
+          requests:
+            cpu: "1"
+            ephemeral-storage: 1Gi
+            memory: 2Gi
+        securityContext:
+          capabilities:
+            add:
+            - NET_RAW
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /var/www/html/app
+          name: fibis-web-docroot
+        - mountPath: /var/www/html/app/locandine
+          name: fibis-web-files
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - name: fibis-web-docroot
+        persistentVolumeClaim:
+          claimName: fibis-web-docroot
+      - name: fibis-web-files
+        persistentVolumeClaim:
+          claimName: fibis-web-files
+status:
+  conditions:
+  - lastTransitionTime: "2026-06-16T15:57:03Z"
+    lastUpdateTime: "2026-06-23T16:02:17Z"
+    message: ReplicaSet "fibis-web-9f77f7744" has successfully progressed.
+    reason: NewReplicaSetAvailable
+    status: "True"
+    type: Progressing
+  - lastTransitionTime: "2026-06-27T23:17:14Z"
+    lastUpdateTime: "2026-06-27T23:17:14Z"
+    message: Deployment has minimum availability.
+    reason: MinimumReplicasAvailable
+    status: "True"
+    type: Available
+  observedGeneration: 5
+  terminatingReplicas: 0

@@ -1,0 +1,124 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    deployment.kubernetes.io/revision: "3"
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{},"name":"fisi","namespace":"default"},"spec":{"replicas":1,"selector":{"matchLabels":{"app":"fisi"}},"template":{"metadata":{"labels":{"app":"fisi"}},"spec":{"containers":[{"env":[{"name":"DB_HOST","value":"10.170.76.28"},{"name":"DB_SCHEMA","value":"fisi_new"},{"name":"APPLICATIVO","value":"fisi"}],"envFrom":[{"secretRef":{"name":"fisi-db"}},{"configMapRef":{"name":"vcf"}}],"image":"europe-west8-docker.pkg.dev/n-gke-fsn-prod-488511/repo-prod/fisi:2.42","imagePullPolicy":"IfNotPresent","livenessProbe":{"failureThreshold":3,"httpGet":{"path":"/user/","port":"http","scheme":"HTTP"},"initialDelaySeconds":15,"periodSeconds":30,"successThreshold":1,"timeoutSeconds":15},"name":"fisi","ports":[{"containerPort":80,"name":"http","protocol":"TCP"}],"readinessProbe":{"failureThreshold":3,"httpGet":{"path":"/user/","port":"http","scheme":"HTTP"},"initialDelaySeconds":15,"periodSeconds":30,"successThreshold":1,"timeoutSeconds":15},"resources":{"limits":{"cpu":"500m","ephemeral-storage":"1Gi","memory":"256Mi"},"requests":{"cpu":"100m","ephemeral-storage":"1Gi","memory":"256Mi"}},"securityContext":{"capabilities":{"add":["NET_RAW"]}},"volumeMounts":[{"mountPath":"/var/www/fisi_files","name":"fisi-files"},{"mountPath":"/var/DRUPALFILES/GS_shared","name":"fisi-gsshared"}]}],"volumes":[{"name":"fisi-files","persistentVolumeClaim":{"claimName":"fisi-files"}},{"name":"fisi-gsshared","persistentVolumeClaim":{"claimName":"fisi-gsshared"}}]}}}}
+  creationTimestamp: "2026-05-13T13:05:36Z"
+  generation: 119
+  name: fisi
+  namespace: default
+  resourceVersion: "1783085592153871006"
+  uid: e9f0483b-5bdc-4aa8-aa07-a366e61dd233
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: fisi
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      annotations:
+        kubectl.kubernetes.io/restartedAt: "2026-06-29T07:26:08Z"
+      labels:
+        app: fisi
+    spec:
+      containers:
+      - env:
+        - name: DB_HOST
+          value: 10.170.76.28
+        - name: DB_SCHEMA
+          value: fisi_new
+        - name: APPLICATIVO
+          value: fisi
+        envFrom:
+        - secretRef:
+            name: fisi-db
+        - configMapRef:
+            name: vcf
+        image: europe-west8-docker.pkg.dev/n-gke-fsn-prod-488511/repo-prod/fisi:2.42
+        imagePullPolicy: IfNotPresent
+        livenessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /user/
+            port: http
+            scheme: HTTP
+          initialDelaySeconds: 15
+          periodSeconds: 30
+          successThreshold: 1
+          timeoutSeconds: 15
+        name: fisi
+        ports:
+        - containerPort: 80
+          name: http
+          protocol: TCP
+        readinessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /user/
+            port: http
+            scheme: HTTP
+          initialDelaySeconds: 15
+          periodSeconds: 30
+          successThreshold: 1
+          timeoutSeconds: 15
+        resources:
+          limits:
+            cpu: 500m
+            ephemeral-storage: 1Gi
+            memory: 256Mi
+          requests:
+            cpu: 100m
+            ephemeral-storage: 1Gi
+            memory: 256Mi
+        securityContext:
+          capabilities:
+            add:
+            - NET_RAW
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /var/www/fisi_files
+          name: fisi-files
+        - mountPath: /var/DRUPALFILES/GS_shared
+          name: fisi-gsshared
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - name: fisi-files
+        persistentVolumeClaim:
+          claimName: fisi-files
+      - name: fisi-gsshared
+        persistentVolumeClaim:
+          claimName: fisi-gsshared
+status:
+  availableReplicas: 1
+  conditions:
+  - lastTransitionTime: "2026-05-18T09:41:24Z"
+    lastUpdateTime: "2026-06-29T07:36:22Z"
+    message: ReplicaSet "fisi-6d5955c6bf" has successfully progressed.
+    reason: NewReplicaSetAvailable
+    status: "True"
+    type: Progressing
+  - lastTransitionTime: "2026-07-03T13:26:46Z"
+    lastUpdateTime: "2026-07-03T13:26:46Z"
+    message: Deployment has minimum availability.
+    reason: MinimumReplicasAvailable
+    status: "True"
+    type: Available
+  observedGeneration: 119
+  readyReplicas: 1
+  replicas: 1
+  terminatingReplicas: 0
+  updatedReplicas: 1

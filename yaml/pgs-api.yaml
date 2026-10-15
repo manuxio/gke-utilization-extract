@@ -1,0 +1,112 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    deployment.kubernetes.io/revision: "1"
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{},"name":"pgs-api","namespace":"default"},"spec":{"replicas":1,"selector":{"matchLabels":{"app":"pgs-api"}},"template":{"metadata":{"labels":{"app":"pgs-api"}},"spec":{"containers":[{"env":[{"name":"SERVER_MODE","value":"produzione"},{"name":"DB_HOST","value":"10.170.76.24"},{"name":"DB_SCHEMA","value":"pgs"},{"name":"SERVER_PORT","value":"80"},{"name":"NODE_PREFIX","value":"pgs-api"}],"envFrom":[{"secretRef":{"name":"pgs-api-db"}}],"image":"europe-west8-docker.pkg.dev/n-gke-fsn-prod-488511/repo-prod/pgs-api:0.14","imagePullPolicy":"IfNotPresent","livenessProbe":{"failureThreshold":3,"httpGet":{"path":"/pgs-api/healthcheck","port":"http","scheme":"HTTP"},"initialDelaySeconds":15,"periodSeconds":30,"successThreshold":1,"timeoutSeconds":15},"name":"pgs-api","ports":[{"containerPort":80,"name":"http","protocol":"TCP"}],"readinessProbe":{"failureThreshold":3,"httpGet":{"path":"/pgs-api/healthcheck","port":"http","scheme":"HTTP"},"initialDelaySeconds":15,"periodSeconds":30,"successThreshold":1,"timeoutSeconds":15},"resources":{"limits":{"cpu":"500m","ephemeral-storage":"1Gi","memory":"256Mi"},"requests":{"cpu":"100m","ephemeral-storage":"1Gi","memory":"256Mi"}},"securityContext":{"capabilities":{"add":["NET_RAW"]}}}]}}}}
+  creationTimestamp: "2026-05-13T13:06:00Z"
+  generation: 2
+  name: pgs-api
+  namespace: default
+  resourceVersion: "1782602516033247008"
+  uid: 9330d31d-7484-4893-9ea9-2d2c2d575585
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: pgs-api
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: pgs-api
+    spec:
+      containers:
+      - env:
+        - name: SERVER_MODE
+          value: produzione
+        - name: DB_HOST
+          value: 10.170.76.24
+        - name: DB_SCHEMA
+          value: pgs
+        - name: SERVER_PORT
+          value: "80"
+        - name: NODE_PREFIX
+          value: pgs-api
+        envFrom:
+        - secretRef:
+            name: pgs-api-db
+        image: europe-west8-docker.pkg.dev/n-gke-fsn-prod-488511/repo-prod/pgs-api:0.14
+        imagePullPolicy: IfNotPresent
+        livenessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /pgs-api/healthcheck
+            port: http
+            scheme: HTTP
+          initialDelaySeconds: 15
+          periodSeconds: 30
+          successThreshold: 1
+          timeoutSeconds: 15
+        name: pgs-api
+        ports:
+        - containerPort: 80
+          name: http
+          protocol: TCP
+        readinessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /pgs-api/healthcheck
+            port: http
+            scheme: HTTP
+          initialDelaySeconds: 15
+          periodSeconds: 30
+          successThreshold: 1
+          timeoutSeconds: 15
+        resources:
+          limits:
+            cpu: 500m
+            ephemeral-storage: 1Gi
+            memory: 256Mi
+          requests:
+            cpu: 100m
+            ephemeral-storage: 1Gi
+            memory: 256Mi
+        securityContext:
+          capabilities:
+            add:
+            - NET_RAW
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+status:
+  availableReplicas: 1
+  conditions:
+  - lastTransitionTime: "2026-05-19T07:30:34Z"
+    lastUpdateTime: "2026-05-19T07:32:59Z"
+    message: ReplicaSet "pgs-api-5456bfbb6" has successfully progressed.
+    reason: NewReplicaSetAvailable
+    status: "True"
+    type: Progressing
+  - lastTransitionTime: "2026-06-27T23:21:56Z"
+    lastUpdateTime: "2026-06-27T23:21:56Z"
+    message: Deployment has minimum availability.
+    reason: MinimumReplicasAvailable
+    status: "True"
+    type: Available
+  observedGeneration: 2
+  readyReplicas: 1
+  replicas: 1
+  terminatingReplicas: 0
+  updatedReplicas: 1

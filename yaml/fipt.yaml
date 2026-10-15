@@ -1,0 +1,124 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    deployment.kubernetes.io/revision: "2"
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{},"name":"fipt","namespace":"default"},"spec":{"replicas":1,"selector":{"matchLabels":{"app":"fipt"}},"template":{"metadata":{"labels":{"app":"fipt"}},"spec":{"containers":[{"env":[{"name":"DEVELOPMENT","value":"false"},{"name":"DB_HOST","value":"10.170.76.24"},{"name":"DB_SCHEMA","value":"fipt6"}],"envFrom":[{"secretRef":{"name":"sendgrid-smtp"}},{"secretRef":{"name":"fipt-db"}},{"secretRef":{"name":"po-proxy-db"}},{"configMapRef":{"name":"vcf"}}],"image":"europe-west8-docker.pkg.dev/n-gke-fsn-prod-488511/repo-prod/fipt:latest","imagePullPolicy":"IfNotPresent","livenessProbe":{"failureThreshold":3,"httpGet":{"path":"/user/","port":"http","scheme":"HTTP"},"initialDelaySeconds":15,"periodSeconds":30,"successThreshold":1,"timeoutSeconds":15},"name":"fipt","ports":[{"containerPort":80,"name":"http","protocol":"TCP"}],"readinessProbe":{"failureThreshold":3,"httpGet":{"path":"/user/","port":"http","scheme":"HTTP"},"initialDelaySeconds":15,"periodSeconds":30,"successThreshold":1,"timeoutSeconds":15},"resources":{"limits":{"cpu":"500m","memory":"256Mi"},"requests":{"cpu":"100m","memory":"256Mi"}},"securityContext":{"capabilities":{"add":["NET_RAW"]}},"volumeMounts":[{"mountPath":"/var/www/fipt6_files","name":"fipt-files"},{"mountPath":"/var/DRUPALFILES/po_files","name":"fipt-po"}]}],"volumes":[{"name":"fipt-files","persistentVolumeClaim":{"claimName":"fipt-files"}},{"name":"fipt-po","persistentVolumeClaim":{"claimName":"fipt-po"}}]}}}}
+  creationTimestamp: "2026-05-13T13:05:27Z"
+  generation: 3
+  name: fipt
+  namespace: default
+  resourceVersion: "1782602468840207002"
+  uid: 30ed8323-f7de-4edf-bfed-7fdbdaaa0b09
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: fipt
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: fipt
+    spec:
+      containers:
+      - env:
+        - name: DEVELOPMENT
+          value: "false"
+        - name: DB_HOST
+          value: 10.170.76.24
+        - name: DB_SCHEMA
+          value: fipt6
+        envFrom:
+        - secretRef:
+            name: sendgrid-smtp
+        - secretRef:
+            name: fipt-db
+        - secretRef:
+            name: po-proxy-db
+        - configMapRef:
+            name: vcf
+        image: europe-west8-docker.pkg.dev/n-gke-fsn-prod-488511/repo-prod/fipt:latest
+        imagePullPolicy: IfNotPresent
+        livenessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /user/
+            port: http
+            scheme: HTTP
+          initialDelaySeconds: 15
+          periodSeconds: 30
+          successThreshold: 1
+          timeoutSeconds: 15
+        name: fipt
+        ports:
+        - containerPort: 80
+          name: http
+          protocol: TCP
+        readinessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /user/
+            port: http
+            scheme: HTTP
+          initialDelaySeconds: 15
+          periodSeconds: 30
+          successThreshold: 1
+          timeoutSeconds: 15
+        resources:
+          limits:
+            cpu: 500m
+            memory: 256Mi
+          requests:
+            cpu: 100m
+            memory: 256Mi
+        securityContext:
+          capabilities:
+            add:
+            - NET_RAW
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /var/www/fipt6_files
+          name: fipt-files
+        - mountPath: /var/DRUPALFILES/po_files
+          name: fipt-po
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - name: fipt-files
+        persistentVolumeClaim:
+          claimName: fipt-files
+      - name: fipt-po
+        persistentVolumeClaim:
+          claimName: fipt-po
+status:
+  availableReplicas: 1
+  conditions:
+  - lastTransitionTime: "2026-05-18T09:40:27Z"
+    lastUpdateTime: "2026-06-23T16:02:27Z"
+    message: ReplicaSet "fipt-7f66cfcc4" has successfully progressed.
+    reason: NewReplicaSetAvailable
+    status: "True"
+    type: Progressing
+  - lastTransitionTime: "2026-06-27T23:21:08Z"
+    lastUpdateTime: "2026-06-27T23:21:08Z"
+    message: Deployment has minimum availability.
+    reason: MinimumReplicasAvailable
+    status: "True"
+    type: Available
+  observedGeneration: 3
+  readyReplicas: 1
+  replicas: 1
+  terminatingReplicas: 0
+  updatedReplicas: 1

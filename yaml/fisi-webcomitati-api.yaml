@@ -1,0 +1,112 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    deployment.kubernetes.io/revision: "1"
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{},"name":"fisi-webcomitati-api","namespace":"default"},"spec":{"replicas":1,"selector":{"matchLabels":{"app":"fisi-webcomitati-api"}},"template":{"metadata":{"labels":{"app":"fisi-webcomitati-api"}},"spec":{"containers":[{"env":[{"name":"NODE_PREFIX","value":"apiwebcomitati"},{"name":"DB_HOST","value":"10.170.76.28"},{"name":"DB_SCHEMA","value":"fisi_new"},{"name":"SERVER_MODE","value":"produzione"},{"name":"SERVER_PORT","value":"80"}],"envFrom":[{"secretRef":{"name":"fisi-api-db"}}],"image":"europe-west8-docker.pkg.dev/n-gke-fsn-prod-488511/repo-prod/fisi-webcomitati-api:latest","imagePullPolicy":"IfNotPresent","livenessProbe":{"failureThreshold":3,"httpGet":{"path":"/apiwebcomitati/healthcheck","port":"http","scheme":"HTTP"},"initialDelaySeconds":15,"periodSeconds":30,"successThreshold":1,"timeoutSeconds":15},"name":"fisi-webcomitati-api","ports":[{"containerPort":80,"name":"http","protocol":"TCP"}],"readinessProbe":{"failureThreshold":3,"httpGet":{"path":"/apiwebcomitati/healthcheck","port":"http","scheme":"HTTP"},"initialDelaySeconds":15,"periodSeconds":30,"successThreshold":1,"timeoutSeconds":15},"resources":{"limits":{"cpu":"500m","ephemeral-storage":"1Gi","memory":"256Mi"},"requests":{"cpu":"100m","ephemeral-storage":"1Gi","memory":"256Mi"}},"securityContext":{"capabilities":{"add":["NET_RAW"]}}}]}}}}
+  creationTimestamp: "2026-05-13T13:05:35Z"
+  generation: 2
+  name: fisi-webcomitati-api
+  namespace: default
+  resourceVersion: "1782602756206735016"
+  uid: cd2a839c-ecd8-47bd-b1ab-40bd8474c1db
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: fisi-webcomitati-api
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: fisi-webcomitati-api
+    spec:
+      containers:
+      - env:
+        - name: NODE_PREFIX
+          value: apiwebcomitati
+        - name: DB_HOST
+          value: 10.170.76.28
+        - name: DB_SCHEMA
+          value: fisi_new
+        - name: SERVER_MODE
+          value: produzione
+        - name: SERVER_PORT
+          value: "80"
+        envFrom:
+        - secretRef:
+            name: fisi-api-db
+        image: europe-west8-docker.pkg.dev/n-gke-fsn-prod-488511/repo-prod/fisi-webcomitati-api:latest
+        imagePullPolicy: IfNotPresent
+        livenessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /apiwebcomitati/healthcheck
+            port: http
+            scheme: HTTP
+          initialDelaySeconds: 15
+          periodSeconds: 30
+          successThreshold: 1
+          timeoutSeconds: 15
+        name: fisi-webcomitati-api
+        ports:
+        - containerPort: 80
+          name: http
+          protocol: TCP
+        readinessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /apiwebcomitati/healthcheck
+            port: http
+            scheme: HTTP
+          initialDelaySeconds: 15
+          periodSeconds: 30
+          successThreshold: 1
+          timeoutSeconds: 15
+        resources:
+          limits:
+            cpu: 500m
+            ephemeral-storage: 1Gi
+            memory: 256Mi
+          requests:
+            cpu: 100m
+            ephemeral-storage: 1Gi
+            memory: 256Mi
+        securityContext:
+          capabilities:
+            add:
+            - NET_RAW
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+status:
+  availableReplicas: 1
+  conditions:
+  - lastTransitionTime: "2026-05-13T13:05:35Z"
+    lastUpdateTime: "2026-05-13T13:07:14Z"
+    message: ReplicaSet "fisi-webcomitati-api-7cf6dfbbc4" has successfully progressed.
+    reason: NewReplicaSetAvailable
+    status: "True"
+    type: Progressing
+  - lastTransitionTime: "2026-06-27T23:25:56Z"
+    lastUpdateTime: "2026-06-27T23:25:56Z"
+    message: Deployment has minimum availability.
+    reason: MinimumReplicasAvailable
+    status: "True"
+    type: Available
+  observedGeneration: 2
+  readyReplicas: 1
+  replicas: 1
+  terminatingReplicas: 0
+  updatedReplicas: 1

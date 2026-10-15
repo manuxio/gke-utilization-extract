@@ -1,0 +1,131 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    deployment.kubernetes.io/revision: "2"
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{},"name":"fis","namespace":"default"},"spec":{"replicas":1,"selector":{"matchLabels":{"app":"fis"}},"template":{"metadata":{"labels":{"app":"fis"}},"spec":{"containers":[{"env":[{"name":"DEVELOPMENT","value":"false"},{"name":"DB_HOST","value":"10.170.76.24"},{"name":"DB_SCHEMA","value":"fis"}],"envFrom":[{"secretRef":{"name":"sendgrid-smtp"}},{"secretRef":{"name":"fis-db"}},{"secretRef":{"name":"po-proxy-db"}},{"configMapRef":{"name":"vcf"}}],"image":"europe-west8-docker.pkg.dev/n-gke-fsn-prod-488511/repo-prod/fis:latest","imagePullPolicy":"IfNotPresent","livenessProbe":{"failureThreshold":3,"httpGet":{"path":"/user/","port":"http","scheme":"HTTP"},"initialDelaySeconds":15,"periodSeconds":30,"successThreshold":1,"timeoutSeconds":15},"name":"fis","ports":[{"containerPort":80,"name":"http","protocol":"TCP"}],"readinessProbe":{"failureThreshold":3,"httpGet":{"path":"/user/","port":"http","scheme":"HTTP"},"initialDelaySeconds":15,"periodSeconds":30,"successThreshold":1,"timeoutSeconds":15},"resources":{"limits":{"cpu":"500m","ephemeral-storage":"1Gi","memory":"256Mi"},"requests":{"cpu":"100m","ephemeral-storage":"1Gi","memory":"256Mi"}},"securityContext":{"capabilities":{"add":["NET_RAW"]}},"volumeMounts":[{"mountPath":"/var/www/fis_files","name":"fis-files"},{"mountPath":"/var/DRUPALFILES/GS_shared","name":"fis-gsshared"},{"mountPath":"/var/DRUPALFILES/po_files","name":"fis-po"}]}],"volumes":[{"name":"fis-files","persistentVolumeClaim":{"claimName":"fis-files"}},{"name":"fis-gsshared","persistentVolumeClaim":{"claimName":"fis-gsshared"}},{"name":"fis-po","persistentVolumeClaim":{"claimName":"fis-po"}}]}}}}
+  creationTimestamp: "2026-05-13T13:05:30Z"
+  generation: 9
+  name: fis
+  namespace: default
+  resourceVersion: "1783073976793583015"
+  uid: c9767351-9601-4405-94e3-697516b31a99
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: fis
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: fis
+    spec:
+      containers:
+      - env:
+        - name: DEVELOPMENT
+          value: "false"
+        - name: DB_HOST
+          value: 10.170.76.24
+        - name: DB_SCHEMA
+          value: fis
+        envFrom:
+        - secretRef:
+            name: sendgrid-smtp
+        - secretRef:
+            name: fis-db
+        - secretRef:
+            name: po-proxy-db
+        - configMapRef:
+            name: vcf
+        image: europe-west8-docker.pkg.dev/n-gke-fsn-prod-488511/repo-prod/fis:latest
+        imagePullPolicy: IfNotPresent
+        livenessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /user/
+            port: http
+            scheme: HTTP
+          initialDelaySeconds: 15
+          periodSeconds: 30
+          successThreshold: 1
+          timeoutSeconds: 15
+        name: fis
+        ports:
+        - containerPort: 80
+          name: http
+          protocol: TCP
+        readinessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /user/
+            port: http
+            scheme: HTTP
+          initialDelaySeconds: 15
+          periodSeconds: 30
+          successThreshold: 1
+          timeoutSeconds: 15
+        resources:
+          limits:
+            cpu: 500m
+            ephemeral-storage: 1Gi
+            memory: 256Mi
+          requests:
+            cpu: 100m
+            ephemeral-storage: 1Gi
+            memory: 256Mi
+        securityContext:
+          capabilities:
+            add:
+            - NET_RAW
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /var/www/fis_files
+          name: fis-files
+        - mountPath: /var/DRUPALFILES/GS_shared
+          name: fis-gsshared
+        - mountPath: /var/DRUPALFILES/po_files
+          name: fis-po
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - name: fis-files
+        persistentVolumeClaim:
+          claimName: fis-files
+      - name: fis-gsshared
+        persistentVolumeClaim:
+          claimName: fis-gsshared
+      - name: fis-po
+        persistentVolumeClaim:
+          claimName: fis-po
+status:
+  availableReplicas: 1
+  conditions:
+  - lastTransitionTime: "2026-05-18T09:41:49Z"
+    lastUpdateTime: "2026-06-23T16:03:00Z"
+    message: ReplicaSet "fis-5b4c4fb574" has successfully progressed.
+    reason: NewReplicaSetAvailable
+    status: "True"
+    type: Progressing
+  - lastTransitionTime: "2026-07-03T10:14:11Z"
+    lastUpdateTime: "2026-07-03T10:14:11Z"
+    message: Deployment has minimum availability.
+    reason: MinimumReplicasAvailable
+    status: "True"
+    type: Available
+  observedGeneration: 9
+  readyReplicas: 1
+  replicas: 1
+  terminatingReplicas: 0
+  updatedReplicas: 1

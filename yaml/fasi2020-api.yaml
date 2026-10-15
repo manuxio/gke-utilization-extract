@@ -1,0 +1,108 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    deployment.kubernetes.io/revision: "1"
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{},"name":"fasi2020-api","namespace":"default"},"spec":{"replicas":1,"selector":{"matchLabels":{"app":"fasi2020-api"}},"template":{"metadata":{"labels":{"app":"fasi2020-api"}},"spec":{"containers":[{"env":[{"name":"DB_HOST","value":"10.170.76.24"},{"name":"DB_SCHEMA","value":"fasi2020"},{"name":"SERVER_MODE","value":"produzione"},{"name":"SERVER_PORT","value":"80"}],"envFrom":[{"secretRef":{"name":"fasi2020-api-db"}}],"image":"europe-west8-docker.pkg.dev/n-gke-fsn-prod-488511/repo-prod/fasi2020-api:0.4","imagePullPolicy":"IfNotPresent","livenessProbe":{"failureThreshold":3,"httpGet":{"path":"/api/healthcheck","port":"http","scheme":"HTTP"},"initialDelaySeconds":15,"periodSeconds":30,"successThreshold":1,"timeoutSeconds":15},"name":"fasi2020-api","ports":[{"containerPort":80,"name":"http","protocol":"TCP"}],"readinessProbe":{"failureThreshold":3,"httpGet":{"path":"/api/healthcheck","port":"http","scheme":"HTTP"},"initialDelaySeconds":15,"periodSeconds":30,"successThreshold":1,"timeoutSeconds":15},"resources":{"limits":{"cpu":"500m","memory":"256Mi"},"requests":{"cpu":"100m","memory":"256Mi"}},"securityContext":{"capabilities":{"add":["NET_RAW"]}}}]}}}}
+  creationTimestamp: "2026-05-13T13:04:41Z"
+  generation: 2
+  name: fasi2020-api
+  namespace: default
+  resourceVersion: "1782602201823135019"
+  uid: f3dc5446-ae41-4e04-a59a-ef091d636725
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: fasi2020-api
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: fasi2020-api
+    spec:
+      containers:
+      - env:
+        - name: DB_HOST
+          value: 10.170.76.24
+        - name: DB_SCHEMA
+          value: fasi2020
+        - name: SERVER_MODE
+          value: produzione
+        - name: SERVER_PORT
+          value: "80"
+        envFrom:
+        - secretRef:
+            name: fasi2020-api-db
+        image: europe-west8-docker.pkg.dev/n-gke-fsn-prod-488511/repo-prod/fasi2020-api:0.4
+        imagePullPolicy: IfNotPresent
+        livenessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /api/healthcheck
+            port: http
+            scheme: HTTP
+          initialDelaySeconds: 15
+          periodSeconds: 30
+          successThreshold: 1
+          timeoutSeconds: 15
+        name: fasi2020-api
+        ports:
+        - containerPort: 80
+          name: http
+          protocol: TCP
+        readinessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /api/healthcheck
+            port: http
+            scheme: HTTP
+          initialDelaySeconds: 15
+          periodSeconds: 30
+          successThreshold: 1
+          timeoutSeconds: 15
+        resources:
+          limits:
+            cpu: 500m
+            memory: 256Mi
+          requests:
+            cpu: 100m
+            memory: 256Mi
+        securityContext:
+          capabilities:
+            add:
+            - NET_RAW
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+status:
+  availableReplicas: 1
+  conditions:
+  - lastTransitionTime: "2026-05-13T13:04:41Z"
+    lastUpdateTime: "2026-05-13T13:05:18Z"
+    message: ReplicaSet "fasi2020-api-6498bc6ccc" has successfully progressed.
+    reason: NewReplicaSetAvailable
+    status: "True"
+    type: Progressing
+  - lastTransitionTime: "2026-06-27T23:16:41Z"
+    lastUpdateTime: "2026-06-27T23:16:41Z"
+    message: Deployment has minimum availability.
+    reason: MinimumReplicasAvailable
+    status: "True"
+    type: Available
+  observedGeneration: 2
+  readyReplicas: 1
+  replicas: 1
+  terminatingReplicas: 0
+  updatedReplicas: 1

@@ -1,0 +1,140 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    deployment.kubernetes.io/revision: "1"
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{},"name":"solr","namespace":"default"},"spec":{"replicas":1,"selector":{"matchLabels":{"app":"solr"}},"template":{"metadata":{"labels":{"app":"solr"}},"spec":{"containers":[{"env":[{"name":"SOLR_HOME","value":"/var/solr/data"},{"name":"SOLR_PORT","value":"80"},{"name":"SOLR_LOCK_TYPE","value":"single"},{"name":"DB_HOST_FIN","value":"10.170.76.204"},{"name":"DB_SCHEMA_FIN","value":"fin"},{"name":"DB_PORT_FIN","value":"3306"},{"name":"DB_CONNECTION_OPTIONS_FIN","value":"?enabledTLSProtocols=TLSv1.2"},{"name":"DB_HOST_SCRIPT","value":"10.170.76.204"},{"name":"DB_HOST_FIBIS","value":"10.170.76.24"},{"name":"DB_SCHEMA_FIBIS","value":"fibis"},{"name":"DB_PORT_FIBIS","value":"3306"},{"name":"DB_CONNECTION_OPTIONS_FIBIS","value":"?zeroDateTimeBehavior=convertToNull\u0026enabledTLSProtocols=TLSv1.2"},{"name":"SOLR_JAVA_MEM","value":"-Xms1024m -Xmx1024m"}],"envFrom":[{"secretRef":{"name":"solr-db-fin"}},{"secretRef":{"name":"solr-db-fibis"}},{"secretRef":{"name":"solr-db-script"}}],"image":"europe-west8-docker.pkg.dev/n-gke-fsn-prod-488511/repo-prod/solr-740:latest","imagePullPolicy":"IfNotPresent","livenessProbe":{"failureThreshold":3,"httpGet":{"path":"/solr/#/","port":"http","scheme":"HTTP"},"initialDelaySeconds":15,"periodSeconds":30,"successThreshold":1,"timeoutSeconds":15},"name":"solr","ports":[{"containerPort":80,"name":"http","protocol":"TCP"}],"readinessProbe":{"failureThreshold":3,"httpGet":{"path":"/solr/#/","port":"http","scheme":"HTTP"},"initialDelaySeconds":15,"periodSeconds":30,"successThreshold":1,"timeoutSeconds":15},"resources":{"limits":{"cpu":"2","ephemeral-storage":"1Gi","memory":"4Gi"},"requests":{"cpu":"1","ephemeral-storage":"1Gi","memory":"2Gi"}},"securityContext":{"capabilities":{"add":["NET_RAW"]}},"volumeMounts":[{"mountPath":"/var/solr/data","name":"solr-conf"},{"mountPath":"/opt/SCRIPT_SOLR","name":"solr-script"}]}],"volumes":[{"name":"solr-conf","persistentVolumeClaim":{"claimName":"solr-conf"}},{"name":"solr-script","persistentVolumeClaim":{"claimName":"solr-script"}}]}}}}
+  creationTimestamp: "2026-05-13T13:06:07Z"
+  generation: 2
+  name: solr
+  namespace: default
+  resourceVersion: "1782662987854239012"
+  uid: 4f7c769f-4f01-40f9-ae96-25867527f681
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 0
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: solr
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: solr
+    spec:
+      containers:
+      - env:
+        - name: SOLR_HOME
+          value: /var/solr/data
+        - name: SOLR_PORT
+          value: "80"
+        - name: SOLR_LOCK_TYPE
+          value: single
+        - name: DB_HOST_FIN
+          value: 10.170.76.204
+        - name: DB_SCHEMA_FIN
+          value: fin
+        - name: DB_PORT_FIN
+          value: "3306"
+        - name: DB_CONNECTION_OPTIONS_FIN
+          value: ?enabledTLSProtocols=TLSv1.2
+        - name: DB_HOST_SCRIPT
+          value: 10.170.76.204
+        - name: DB_HOST_FIBIS
+          value: 10.170.76.24
+        - name: DB_SCHEMA_FIBIS
+          value: fibis
+        - name: DB_PORT_FIBIS
+          value: "3306"
+        - name: DB_CONNECTION_OPTIONS_FIBIS
+          value: ?zeroDateTimeBehavior=convertToNull&enabledTLSProtocols=TLSv1.2
+        - name: SOLR_JAVA_MEM
+          value: -Xms1024m -Xmx1024m
+        envFrom:
+        - secretRef:
+            name: solr-db-fin
+        - secretRef:
+            name: solr-db-fibis
+        - secretRef:
+            name: solr-db-script
+        image: europe-west8-docker.pkg.dev/n-gke-fsn-prod-488511/repo-prod/solr-740:latest
+        imagePullPolicy: IfNotPresent
+        livenessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /solr/#/
+            port: http
+            scheme: HTTP
+          initialDelaySeconds: 15
+          periodSeconds: 30
+          successThreshold: 1
+          timeoutSeconds: 15
+        name: solr
+        ports:
+        - containerPort: 80
+          name: http
+          protocol: TCP
+        readinessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /solr/#/
+            port: http
+            scheme: HTTP
+          initialDelaySeconds: 15
+          periodSeconds: 30
+          successThreshold: 1
+          timeoutSeconds: 15
+        resources:
+          limits:
+            cpu: "2"
+            ephemeral-storage: 1Gi
+            memory: 4Gi
+          requests:
+            cpu: "1"
+            ephemeral-storage: 1Gi
+            memory: 2Gi
+        securityContext:
+          capabilities:
+            add:
+            - NET_RAW
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /var/solr/data
+          name: solr-conf
+        - mountPath: /opt/SCRIPT_SOLR
+          name: solr-script
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - name: solr-conf
+        persistentVolumeClaim:
+          claimName: solr-conf
+      - name: solr-script
+        persistentVolumeClaim:
+          claimName: solr-script
+status:
+  conditions:
+  - lastTransitionTime: "2026-05-19T07:31:51Z"
+    lastUpdateTime: "2026-05-19T07:31:51Z"
+    message: ReplicaSet "solr-bdb4889c6" has successfully progressed.
+    reason: NewReplicaSetAvailable
+    status: "True"
+    type: Progressing
+  - lastTransitionTime: "2026-06-27T23:26:33Z"
+    lastUpdateTime: "2026-06-27T23:26:33Z"
+    message: Deployment has minimum availability.
+    reason: MinimumReplicasAvailable
+    status: "True"
+    type: Available
+  observedGeneration: 2
+  terminatingReplicas: 0

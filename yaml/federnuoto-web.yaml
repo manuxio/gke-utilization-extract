@@ -1,0 +1,100 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    deployment.kubernetes.io/revision: "2"
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{},"name":"federnuoto-web","namespace":"default"},"spec":{"replicas":1,"selector":{"matchLabels":{"app":"federnuoto-web"}},"template":{"metadata":{"labels":{"app":"federnuoto-web"}},"spec":{"containers":[{"env":[{"name":"APPLICATIVO","value":"federnuoto"},{"name":"DB_HOST","value":"10.170.76.28"},{"name":"DB_SCHEMA","value":"web_rest_federnuoto"}],"envFrom":[{"secretRef":{"name":"sendgrid-smtp"}},{"secretRef":{"name":"federnuoto-web-db"}},{"configMapRef":{"name":"vcf"}}],"image":"europe-west8-docker.pkg.dev/n-gke-fsn-prod-488511/repo-prod/joomla-common-php72-iti-log:0.1","imagePullPolicy":"IfNotPresent","name":"federnuoto-web","ports":[{"containerPort":80,"name":"http","protocol":"TCP"}],"resources":{"limits":{"cpu":"2","ephemeral-storage":"1Gi","memory":"4Gi"},"requests":{"cpu":"1","ephemeral-storage":"1Gi","memory":"2Gi"}},"securityContext":{"capabilities":{"add":["NET_RAW"]}},"volumeMounts":[{"mountPath":"/var/www/html/app","name":"federnuoto-web-docroot"},{"mountPath":"/var/www/fin_files","name":"federnuoto-web-files"}]}],"volumes":[{"name":"federnuoto-web-docroot","persistentVolumeClaim":{"claimName":"federnuoto-web-docroot"}},{"name":"federnuoto-web-files","persistentVolumeClaim":{"claimName":"federnuoto-web-files"}}]}}}}
+  creationTimestamp: "2026-05-13T13:04:50Z"
+  generation: 4
+  name: federnuoto-web
+  namespace: default
+  resourceVersion: "1782663015562927006"
+  uid: 09f80cc3-906f-4ec1-8008-5a39a7dd00ac
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 0
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: federnuoto-web
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: federnuoto-web
+    spec:
+      containers:
+      - env:
+        - name: APPLICATIVO
+          value: federnuoto
+        - name: DB_HOST
+          value: 10.170.76.28
+        - name: DB_SCHEMA
+          value: web_rest_federnuoto
+        envFrom:
+        - secretRef:
+            name: sendgrid-smtp
+        - secretRef:
+            name: federnuoto-web-db
+        - configMapRef:
+            name: vcf
+        image: europe-west8-docker.pkg.dev/n-gke-fsn-prod-488511/repo-prod/joomla-common-php72-iti-log:0.1
+        imagePullPolicy: IfNotPresent
+        name: federnuoto-web
+        ports:
+        - containerPort: 80
+          name: http
+          protocol: TCP
+        resources:
+          limits:
+            cpu: "2"
+            ephemeral-storage: 1Gi
+            memory: 4Gi
+          requests:
+            cpu: "1"
+            ephemeral-storage: 1Gi
+            memory: 2Gi
+        securityContext:
+          capabilities:
+            add:
+            - NET_RAW
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /var/www/html/app
+          name: federnuoto-web-docroot
+        - mountPath: /var/www/fin_files
+          name: federnuoto-web-files
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - name: federnuoto-web-docroot
+        persistentVolumeClaim:
+          claimName: federnuoto-web-docroot
+      - name: federnuoto-web-files
+        persistentVolumeClaim:
+          claimName: federnuoto-web-files
+status:
+  conditions:
+  - lastTransitionTime: "2026-05-13T13:04:50Z"
+    lastUpdateTime: "2026-06-23T16:01:10Z"
+    message: ReplicaSet "federnuoto-web-964cb8d6b" has successfully progressed.
+    reason: NewReplicaSetAvailable
+    status: "True"
+    type: Progressing
+  - lastTransitionTime: "2026-06-27T23:16:39Z"
+    lastUpdateTime: "2026-06-27T23:16:39Z"
+    message: Deployment has minimum availability.
+    reason: MinimumReplicasAvailable
+    status: "True"
+    type: Available
+  observedGeneration: 4
+  terminatingReplicas: 0

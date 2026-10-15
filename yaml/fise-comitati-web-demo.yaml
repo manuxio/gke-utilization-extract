@@ -1,0 +1,97 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    deployment.kubernetes.io/revision: "2"
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{},"name":"fise-comitati-web-demo","namespace":"default"},"spec":{"replicas":1,"selector":{"matchLabels":{"app":"fise-comitati-web-demo"}},"template":{"metadata":{"labels":{"app":"fise-comitati-web-demo"}},"spec":{"containers":[{"env":[{"name":"APPLICATIVO","value":"FISE_COMITATI_demo"},{"name":"DB_HOST","value":"10.170.76.24"},{"name":"DB_SCHEMA","value":"rest_fise_comitati_demo"}],"envFrom":[{"secretRef":{"name":"sendgrid-smtp"}},{"secretRef":{"name":"fise-comitati-web-db"}},{"configMapRef":{"name":"vcf"}}],"image":"europe-west8-docker.pkg.dev/n-gke-fsn-prod-488511/repo-prod/joomla-common-php7.4:0.1","imagePullPolicy":"IfNotPresent","name":"fise-comitati-web-demo","ports":[{"containerPort":80,"name":"http","protocol":"TCP"}],"resources":{"limits":{"cpu":"1000m","memory":"2048Mi"},"requests":{"cpu":"1000m","memory":"2048Mi"}},"securityContext":{"capabilities":{"add":["NET_RAW"]}},"volumeMounts":[{"mountPath":"/var/www/html/app","name":"fise-comitati-web-demo-docroot"}]}],"volumes":[{"name":"fise-comitati-web-demo-docroot","persistentVolumeClaim":{"claimName":"fise-comitati-web-demo-docroot"}}]}}}}
+  creationTimestamp: "2026-05-21T13:56:27Z"
+  generation: 3
+  name: fise-comitati-web-demo
+  namespace: default
+  resourceVersion: "1782602260797839016"
+  uid: e09e3f51-1d4b-4552-879a-70f20aaab0d8
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: fise-comitati-web-demo
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: fise-comitati-web-demo
+    spec:
+      containers:
+      - env:
+        - name: APPLICATIVO
+          value: FISE_COMITATI_demo
+        - name: DB_HOST
+          value: 10.170.76.24
+        - name: DB_SCHEMA
+          value: rest_fise_comitati_demo
+        envFrom:
+        - secretRef:
+            name: sendgrid-smtp
+        - secretRef:
+            name: fise-comitati-web-db
+        - configMapRef:
+            name: vcf
+        image: europe-west8-docker.pkg.dev/n-gke-fsn-prod-488511/repo-prod/joomla-common-php7.4:0.1
+        imagePullPolicy: IfNotPresent
+        name: fise-comitati-web-demo
+        ports:
+        - containerPort: 80
+          name: http
+          protocol: TCP
+        resources:
+          limits:
+            cpu: "1"
+            memory: 2Gi
+          requests:
+            cpu: "1"
+            memory: 2Gi
+        securityContext:
+          capabilities:
+            add:
+            - NET_RAW
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /var/www/html/app
+          name: fise-comitati-web-demo-docroot
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - name: fise-comitati-web-demo-docroot
+        persistentVolumeClaim:
+          claimName: fise-comitati-web-demo-docroot
+status:
+  availableReplicas: 1
+  conditions:
+  - lastTransitionTime: "2026-05-21T13:56:27Z"
+    lastUpdateTime: "2026-06-23T16:03:47Z"
+    message: ReplicaSet "fise-comitati-web-demo-74f48f99d7" has successfully progressed.
+    reason: NewReplicaSetAvailable
+    status: "True"
+    type: Progressing
+  - lastTransitionTime: "2026-06-27T23:17:40Z"
+    lastUpdateTime: "2026-06-27T23:17:40Z"
+    message: Deployment has minimum availability.
+    reason: MinimumReplicasAvailable
+    status: "True"
+    type: Available
+  observedGeneration: 3
+  readyReplicas: 1
+  replicas: 1
+  terminatingReplicas: 0
+  updatedReplicas: 1

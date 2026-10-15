@@ -1,0 +1,125 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    deployment.kubernetes.io/revision: "3"
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{},"name":"fim-knk","namespace":"default"},"spec":{"replicas":1,"selector":{"matchLabels":{"app":"fim-knk"}},"template":{"metadata":{"labels":{"app":"fim-knk"}},"spec":{"containers":[{"env":[{"name":"DB_HOST","value":"10.170.76.22"},{"name":"DB_SCHEMA","value":"fim"},{"name":"REGISTROSES_HOST","value":"https://registro.sportesalute.eu"},{"name":"REGISTROCONI_HOST","value":"https://rssd.coni.it/rssdWS.php?WSDL"},{"name":"REGISTROCONI_SFTP","value":"ftprssd.coni.it"}],"envFrom":[{"secretRef":{"name":"sendgrid-smtp"}},{"secretRef":{"name":"fim-knk-db"}},{"secretRef":{"name":"fim-ses"}},{"secretRef":{"name":"fim-coni"}},{"configMapRef":{"name":"vcf"}},{"configMapRef":{"name":"mail-fim-coni"}}],"image":"europe-west8-docker.pkg.dev/n-gke-fsn-prod-488511/repo-prod/fim-knk:latest","imagePullPolicy":"IfNotPresent","livenessProbe":{"failureThreshold":3,"httpGet":{"path":"/api/healthcheck/","port":"http","scheme":"HTTP"},"initialDelaySeconds":15,"periodSeconds":30,"successThreshold":1,"timeoutSeconds":15},"name":"fim-knk","ports":[{"containerPort":80,"name":"http","protocol":"TCP"}],"readinessProbe":{"failureThreshold":3,"httpGet":{"path":"/api/healthcheck/","port":"http","scheme":"HTTP"},"initialDelaySeconds":15,"periodSeconds":30,"successThreshold":1,"timeoutSeconds":15},"resources":{"limits":{"cpu":"500m","ephemeral-storage":"1Gi","memory":"1024Mi"},"requests":{"cpu":"250m","ephemeral-storage":"1Gi","memory":"1024Mi"}},"securityContext":{"capabilities":{"add":["NET_RAW"]}},"volumeMounts":[{"mountPath":"/app/src/files","name":"fim-knk-files2"}]}],"volumes":[{"name":"fim-knk-files2","persistentVolumeClaim":{"claimName":"fim-knk-files2"}}]}}}}
+  creationTimestamp: "2026-05-13T13:05:18Z"
+  generation: 5
+  name: fim-knk
+  namespace: default
+  resourceVersion: "1782662988457775014"
+  uid: 639b43dd-1248-4f88-a209-3d9d76144148
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 0
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: fim-knk
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: fim-knk
+    spec:
+      containers:
+      - env:
+        - name: DB_HOST
+          value: 10.170.76.22
+        - name: DB_SCHEMA
+          value: fim
+        - name: REGISTROSES_HOST
+          value: https://registro.sportesalute.eu
+        - name: REGISTROCONI_HOST
+          value: https://rssd.coni.it/rssdWS.php?WSDL
+        - name: REGISTROCONI_SFTP
+          value: ftprssd.coni.it
+        envFrom:
+        - secretRef:
+            name: sendgrid-smtp
+        - secretRef:
+            name: fim-knk-db
+        - secretRef:
+            name: fim-ses
+        - secretRef:
+            name: fim-coni
+        - configMapRef:
+            name: vcf
+        - configMapRef:
+            name: mail-fim-coni
+        image: europe-west8-docker.pkg.dev/n-gke-fsn-prod-488511/repo-prod/fim-knk:latest
+        imagePullPolicy: IfNotPresent
+        livenessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /api/healthcheck/
+            port: http
+            scheme: HTTP
+          initialDelaySeconds: 15
+          periodSeconds: 30
+          successThreshold: 1
+          timeoutSeconds: 15
+        name: fim-knk
+        ports:
+        - containerPort: 80
+          name: http
+          protocol: TCP
+        readinessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /api/healthcheck/
+            port: http
+            scheme: HTTP
+          initialDelaySeconds: 15
+          periodSeconds: 30
+          successThreshold: 1
+          timeoutSeconds: 15
+        resources:
+          limits:
+            cpu: 500m
+            ephemeral-storage: 1Gi
+            memory: 1Gi
+          requests:
+            cpu: 250m
+            ephemeral-storage: 1Gi
+            memory: 1Gi
+        securityContext:
+          capabilities:
+            add:
+            - NET_RAW
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /app/src/files
+          name: fim-knk-files2
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - name: fim-knk-files2
+        persistentVolumeClaim:
+          claimName: fim-knk-files2
+status:
+  conditions:
+  - lastTransitionTime: "2026-05-13T13:05:18Z"
+    lastUpdateTime: "2026-06-23T16:02:35Z"
+    message: ReplicaSet "fim-knk-65dc89869c" has successfully progressed.
+    reason: NewReplicaSetAvailable
+    status: "True"
+    type: Progressing
+  - lastTransitionTime: "2026-06-27T23:21:01Z"
+    lastUpdateTime: "2026-06-27T23:21:01Z"
+    message: Deployment has minimum availability.
+    reason: MinimumReplicasAvailable
+    status: "True"
+    type: Available
+  observedGeneration: 5
+  terminatingReplicas: 0

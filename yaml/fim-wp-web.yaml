@@ -1,0 +1,91 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    deployment.kubernetes.io/revision: "2"
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{},"name":"fim-wp-web","namespace":"default"},"spec":{"replicas":1,"selector":{"matchLabels":{"app":"fim-wp-web"}},"template":{"metadata":{"labels":{"app":"fim-wp-web"}},"spec":{"containers":[{"image":"europe-west8-docker.pkg.dev/n-gke-fsn-prod-488511/repo-prod/wordpress:1.0","imagePullPolicy":"IfNotPresent","name":"fim-wp-web","ports":[{"containerPort":80,"name":"http","protocol":"TCP"}],"resources":{"limits":{"cpu":"500m","ephemeral-storage":"1Gi","memory":"1024Mi"},"requests":{"cpu":"250m","ephemeral-storage":"1Gi","memory":"1024Mi"}},"securityContext":{"capabilities":{"add":["NET_RAW"]}},"volumeMounts":[{"mountPath":"/var/www/html","name":"fim-wp-web-docroot"},{"mountPath":"/etc/apache2/sites-available","name":"fim-wp-web-sitesavailable"},{"mountPath":"/etc/apache2/sites-enabled","name":"fim-wp-web-sitesenabled"}]}],"volumes":[{"name":"fim-wp-web-docroot","persistentVolumeClaim":{"claimName":"fim-wp-web-docroot"}},{"name":"fim-wp-web-sitesavailable","persistentVolumeClaim":{"claimName":"fim-wp-web-sitesavailable"}},{"name":"fim-wp-web-sitesenabled","persistentVolumeClaim":{"claimName":"fim-wp-web-sitesenabled"}}]}}}}
+  creationTimestamp: "2026-05-13T13:05:20Z"
+  generation: 4
+  name: fim-wp-web
+  namespace: default
+  resourceVersion: "1782662986771343002"
+  uid: fb262e89-255a-4cb6-9385-5c83cb223179
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 0
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: fim-wp-web
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: fim-wp-web
+    spec:
+      containers:
+      - image: europe-west8-docker.pkg.dev/n-gke-fsn-prod-488511/repo-prod/wordpress:1.0
+        imagePullPolicy: IfNotPresent
+        name: fim-wp-web
+        ports:
+        - containerPort: 80
+          name: http
+          protocol: TCP
+        resources:
+          limits:
+            cpu: 500m
+            ephemeral-storage: 1Gi
+            memory: 1Gi
+          requests:
+            cpu: 250m
+            ephemeral-storage: 1Gi
+            memory: 1Gi
+        securityContext:
+          capabilities:
+            add:
+            - NET_RAW
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /var/www/html
+          name: fim-wp-web-docroot
+        - mountPath: /etc/apache2/sites-available
+          name: fim-wp-web-sitesavailable
+        - mountPath: /etc/apache2/sites-enabled
+          name: fim-wp-web-sitesenabled
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - name: fim-wp-web-docroot
+        persistentVolumeClaim:
+          claimName: fim-wp-web-docroot
+      - name: fim-wp-web-sitesavailable
+        persistentVolumeClaim:
+          claimName: fim-wp-web-sitesavailable
+      - name: fim-wp-web-sitesenabled
+        persistentVolumeClaim:
+          claimName: fim-wp-web-sitesenabled
+status:
+  conditions:
+  - lastTransitionTime: "2026-05-13T13:05:20Z"
+    lastUpdateTime: "2026-06-03T10:34:50Z"
+    message: ReplicaSet "fim-wp-web-8646dbb56f" has successfully progressed.
+    reason: NewReplicaSetAvailable
+    status: "True"
+    type: Progressing
+  - lastTransitionTime: "2026-06-27T23:17:20Z"
+    lastUpdateTime: "2026-06-27T23:17:20Z"
+    message: Deployment has minimum availability.
+    reason: MinimumReplicasAvailable
+    status: "True"
+    type: Available
+  observedGeneration: 4
+  terminatingReplicas: 0

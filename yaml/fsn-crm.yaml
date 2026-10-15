@@ -1,0 +1,130 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    deployment.kubernetes.io/revision: "3"
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{},"name":"fsn-crm","namespace":"default"},"spec":{"replicas":1,"selector":{"matchLabels":{"app":"fsn-crm"}},"template":{"metadata":{"labels":{"app":"fsn-crm"}},"spec":{"containers":[{"env":[{"name":"SERVER_MODE","value":"produzione"},{"name":"DB_HOST_crm_fisi","value":"10.170.76.28"},{"name":"DB_SCHEMA_crm_fisi","value":"fisi_new"},{"name":"DB_HOST_crm_fita","value":"10.170.76.24"},{"name":"DB_SCHEMA_crm_fita","value":"fita"},{"name":"DB_HOST_crm_fitri","value":"10.170.76.24"},{"name":"DB_SCHEMA_crm_fitri","value":"fitri"},{"name":"DB_HOST_crm_fisr","value":"10.170.76.24"},{"name":"DB_SCHEMA_crm_fisr","value":"fihp"},{"name":"DB_HOST_crm_fick","value":"10.170.76.24"},{"name":"DB_SCHEMA_crm_fick","value":"fick"},{"name":"DB_HOST_crm_fiba","value":"10.170.76.24"},{"name":"DB_SCHEMA_crm_fiba","value":"fiban"},{"name":"DB_HOST_crm_fitet","value":"10.170.76.24"},{"name":"DB_SCHEMA_crm_fitet","value":"fitet"},{"name":"DB_HOST_crm_fijlkam","value":"10.170.76.24"},{"name":"DB_SCHEMA_crm_fijlkam","value":"fijlkam"}],"envFrom":[{"secretRef":{"name":"crm-fisi-db"}},{"secretRef":{"name":"crm-fita-db"}},{"secretRef":{"name":"crm-fitri-db"}},{"secretRef":{"name":"crm-fisr-db"}},{"secretRef":{"name":"crm-fick-db"}},{"secretRef":{"name":"crm-fiba-db"}},{"secretRef":{"name":"crm-fitet-db"}},{"secretRef":{"name":"crm-fijlkam-db"}}],"image":"europe-west8-docker.pkg.dev/n-gke-fsn-prod-488511/repo-prod/fsn-crm:0.15","imagePullPolicy":"IfNotPresent","name":"fsn-crm","ports":[{"containerPort":80,"name":"http","protocol":"TCP"}],"resources":{"limits":{"cpu":"1","ephemeral-storage":"1Gi","memory":"2Gi"},"requests":{"cpu":"500m","ephemeral-storage":"1Gi","memory":"2Gi"}},"securityContext":{"capabilities":{"add":["NET_RAW"]}}}]}}}}
+  creationTimestamp: "2026-05-13T13:05:59Z"
+  generation: 3
+  name: fsn-crm
+  namespace: default
+  resourceVersion: "1782602748413007000"
+  uid: bae7641a-622b-4dbb-bc7e-ba6b4279fab1
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: fsn-crm
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: fsn-crm
+    spec:
+      containers:
+      - env:
+        - name: SERVER_MODE
+          value: produzione
+        - name: DB_HOST_crm_fisi
+          value: 10.170.76.28
+        - name: DB_SCHEMA_crm_fisi
+          value: fisi_new
+        - name: DB_HOST_crm_fita
+          value: 10.170.76.24
+        - name: DB_SCHEMA_crm_fita
+          value: fita
+        - name: DB_HOST_crm_fitri
+          value: 10.170.76.24
+        - name: DB_SCHEMA_crm_fitri
+          value: fitri
+        - name: DB_HOST_crm_fisr
+          value: 10.170.76.24
+        - name: DB_SCHEMA_crm_fisr
+          value: fihp
+        - name: DB_HOST_crm_fick
+          value: 10.170.76.24
+        - name: DB_SCHEMA_crm_fick
+          value: fick
+        - name: DB_HOST_crm_fiba
+          value: 10.170.76.24
+        - name: DB_SCHEMA_crm_fiba
+          value: fiban
+        - name: DB_HOST_crm_fitet
+          value: 10.170.76.24
+        - name: DB_SCHEMA_crm_fitet
+          value: fitet
+        - name: DB_HOST_crm_fijlkam
+          value: 10.170.76.24
+        - name: DB_SCHEMA_crm_fijlkam
+          value: fijlkam
+        envFrom:
+        - secretRef:
+            name: crm-fisi-db
+        - secretRef:
+            name: crm-fita-db
+        - secretRef:
+            name: crm-fitri-db
+        - secretRef:
+            name: crm-fisr-db
+        - secretRef:
+            name: crm-fick-db
+        - secretRef:
+            name: crm-fiba-db
+        - secretRef:
+            name: crm-fitet-db
+        - secretRef:
+            name: crm-fijlkam-db
+        image: europe-west8-docker.pkg.dev/n-gke-fsn-prod-488511/repo-prod/fsn-crm:0.15
+        imagePullPolicy: IfNotPresent
+        name: fsn-crm
+        ports:
+        - containerPort: 80
+          name: http
+          protocol: TCP
+        resources:
+          limits:
+            cpu: "1"
+            ephemeral-storage: 1Gi
+            memory: 2Gi
+          requests:
+            cpu: 500m
+            ephemeral-storage: 1Gi
+            memory: 2Gi
+        securityContext:
+          capabilities:
+            add:
+            - NET_RAW
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+status:
+  availableReplicas: 1
+  conditions:
+  - lastTransitionTime: "2026-05-19T07:30:05Z"
+    lastUpdateTime: "2026-06-08T09:31:40Z"
+    message: ReplicaSet "fsn-crm-975987f9d" has successfully progressed.
+    reason: NewReplicaSetAvailable
+    status: "True"
+    type: Progressing
+  - lastTransitionTime: "2026-06-27T23:25:48Z"
+    lastUpdateTime: "2026-06-27T23:25:48Z"
+    message: Deployment has minimum availability.
+    reason: MinimumReplicasAvailable
+    status: "True"
+    type: Available
+  observedGeneration: 3
+  readyReplicas: 1
+  replicas: 1
+  terminatingReplicas: 0
+  updatedReplicas: 1

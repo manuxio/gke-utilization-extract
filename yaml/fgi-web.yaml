@@ -1,0 +1,125 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    deployment.kubernetes.io/revision: "3"
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{},"name":"fgi-web","namespace":"default"},"spec":{"replicas":1,"selector":{"matchLabels":{"app":"fgi-web"}},"template":{"metadata":{"labels":{"app":"fgi-web"}},"spec":{"containers":[{"env":[{"name":"APPLICATIVO","value":"fgi_staging"}],"image":"europe-west8-docker.pkg.dev/n-gke-fsn-prod-488511/repo-prod/joomla-apache2-php8-3-8-iti-log:0.6","imagePullPolicy":"IfNotPresent","livenessProbe":{"failureThreshold":3,"httpGet":{"path":"/callbacks/check.txt","port":"http","scheme":"HTTP"},"initialDelaySeconds":15,"periodSeconds":30,"successThreshold":1,"timeoutSeconds":15},"name":"fgi-web","ports":[{"containerPort":80,"name":"http","protocol":"TCP"}],"readinessProbe":{"failureThreshold":3,"httpGet":{"path":"/callbacks/check.txt","port":"http","scheme":"HTTP"},"initialDelaySeconds":15,"periodSeconds":30,"successThreshold":1,"timeoutSeconds":15},"resources":{"limits":{"cpu":"2","ephemeral-storage":"1Gi","memory":"4Gi"},"requests":{"cpu":"1","ephemeral-storage":"1Gi","memory":"2Gi"}},"securityContext":{"capabilities":{"add":["NET_RAW"]}},"volumeMounts":[{"mountPath":"/var/www/html/app","name":"fgi-web-documentroot"},{"mountPath":"/var/www/html/app/fgi_files","name":"fgi-web-files"},{"mountPath":"/etc/apache2/sites-available","name":"fgi-web-sites-available"},{"mountPath":"/etc/apache2/sites-enabled","name":"fgi-web-sites-enabled"}]}],"volumes":[{"name":"fgi-web-documentroot","persistentVolumeClaim":{"claimName":"fgi-web-documentroot"}},{"name":"fgi-web-files","persistentVolumeClaim":{"claimName":"fgi-web-files"}},{"name":"fgi-web-sites-available","persistentVolumeClaim":{"claimName":"fgi-web-sites-available"}},{"name":"fgi-web-sites-enabled","persistentVolumeClaim":{"claimName":"fgi-web-sites-enabled"}}]}}}}
+  creationTimestamp: "2026-05-13T13:04:54Z"
+  generation: 665
+  name: fgi-web
+  namespace: default
+  resourceVersion: "1783085006174063008"
+  uid: 58bcc55f-edbb-409f-add6-a4641326487c
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 2
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: fgi-web
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      annotations:
+        kubectl.kubernetes.io/restartedAt: "2026-07-01T08:55:30Z"
+      labels:
+        app: fgi-web
+    spec:
+      containers:
+      - env:
+        - name: APPLICATIVO
+          value: fgi_staging
+        image: europe-west8-docker.pkg.dev/n-gke-fsn-prod-488511/repo-prod/joomla-apache2-php8-3-8-iti-log:0.6
+        imagePullPolicy: IfNotPresent
+        livenessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /callbacks/check.txt
+            port: http
+            scheme: HTTP
+          initialDelaySeconds: 15
+          periodSeconds: 30
+          successThreshold: 1
+          timeoutSeconds: 15
+        name: fgi-web
+        ports:
+        - containerPort: 80
+          name: http
+          protocol: TCP
+        readinessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /callbacks/check.txt
+            port: http
+            scheme: HTTP
+          initialDelaySeconds: 15
+          periodSeconds: 30
+          successThreshold: 1
+          timeoutSeconds: 15
+        resources:
+          limits:
+            cpu: "2"
+            ephemeral-storage: 1Gi
+            memory: 4Gi
+          requests:
+            cpu: "1"
+            ephemeral-storage: 1Gi
+            memory: 2Gi
+        securityContext:
+          capabilities:
+            add:
+            - NET_RAW
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /var/www/html/app
+          name: fgi-web-documentroot
+        - mountPath: /var/www/html/app/fgi_files
+          name: fgi-web-files
+        - mountPath: /etc/apache2/sites-available
+          name: fgi-web-sites-available
+        - mountPath: /etc/apache2/sites-enabled
+          name: fgi-web-sites-enabled
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - name: fgi-web-documentroot
+        persistentVolumeClaim:
+          claimName: fgi-web-documentroot
+      - name: fgi-web-files
+        persistentVolumeClaim:
+          claimName: fgi-web-files
+      - name: fgi-web-sites-available
+        persistentVolumeClaim:
+          claimName: fgi-web-sites-available
+      - name: fgi-web-sites-enabled
+        persistentVolumeClaim:
+          claimName: fgi-web-sites-enabled
+status:
+  availableReplicas: 2
+  conditions:
+  - lastTransitionTime: "2026-05-13T13:04:54Z"
+    lastUpdateTime: "2026-07-01T08:56:04Z"
+    message: ReplicaSet "fgi-web-64f8fb997c" has successfully progressed.
+    reason: NewReplicaSetAvailable
+    status: "True"
+    type: Progressing
+  - lastTransitionTime: "2026-07-03T13:23:26Z"
+    lastUpdateTime: "2026-07-03T13:23:26Z"
+    message: Deployment has minimum availability.
+    reason: MinimumReplicasAvailable
+    status: "True"
+    type: Available
+  observedGeneration: 665
+  readyReplicas: 2
+  replicas: 2
+  terminatingReplicas: 0
+  updatedReplicas: 2

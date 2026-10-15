@@ -1,0 +1,114 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    deployment.kubernetes.io/revision: "1"
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{},"name":"fiv-api-web","namespace":"default"},"spec":{"replicas":1,"selector":{"matchLabels":{"app":"fiv-api-web"}},"template":{"metadata":{"labels":{"app":"fiv-api-web"}},"spec":{"containers":[{"env":[{"name":"NODE_PREFIX","value":"api"},{"name":"DB_HOST","value":"10.170.76.34"},{"name":"DB_SCHEMA","value":"fiv_dati"},{"name":"SERVER_MODE","value":"produzione"},{"name":"SERVER_PORT","value":"80"}],"envFrom":[{"secretRef":{"name":"fiv-api-db"}},{"secretRef":{"name":"po-proxy-db"}}],"image":"europe-west8-docker.pkg.dev/n-gke-fsn-prod-488511/repo-prod/fiv-api-web:latest","imagePullPolicy":"IfNotPresent","livenessProbe":{"failureThreshold":3,"httpGet":{"path":"/api/healthcheck/","port":"http","scheme":"HTTP"},"initialDelaySeconds":15,"periodSeconds":30,"successThreshold":1,"timeoutSeconds":15},"name":"fiv-api-web","ports":[{"containerPort":80,"name":"http","protocol":"TCP"}],"readinessProbe":{"failureThreshold":3,"httpGet":{"path":"/api/healthcheck/","port":"http","scheme":"HTTP"},"initialDelaySeconds":15,"periodSeconds":30,"successThreshold":1,"timeoutSeconds":15},"resources":{"limits":{"cpu":"500m","ephemeral-storage":"1Gi","memory":"256Mi"},"requests":{"cpu":"100m","ephemeral-storage":"1Gi","memory":"256Mi"}},"securityContext":{"capabilities":{"add":["NET_RAW"]}}}]}}}}
+  creationTimestamp: "2026-05-13T13:05:52Z"
+  generation: 2
+  name: fiv-api-web
+  namespace: default
+  resourceVersion: "1782602303720463001"
+  uid: b64973be-99f8-4b36-a20a-6adda7bf217b
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: fiv-api-web
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: fiv-api-web
+    spec:
+      containers:
+      - env:
+        - name: NODE_PREFIX
+          value: api
+        - name: DB_HOST
+          value: 10.170.76.34
+        - name: DB_SCHEMA
+          value: fiv_dati
+        - name: SERVER_MODE
+          value: produzione
+        - name: SERVER_PORT
+          value: "80"
+        envFrom:
+        - secretRef:
+            name: fiv-api-db
+        - secretRef:
+            name: po-proxy-db
+        image: europe-west8-docker.pkg.dev/n-gke-fsn-prod-488511/repo-prod/fiv-api-web:latest
+        imagePullPolicy: IfNotPresent
+        livenessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /api/healthcheck/
+            port: http
+            scheme: HTTP
+          initialDelaySeconds: 15
+          periodSeconds: 30
+          successThreshold: 1
+          timeoutSeconds: 15
+        name: fiv-api-web
+        ports:
+        - containerPort: 80
+          name: http
+          protocol: TCP
+        readinessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /api/healthcheck/
+            port: http
+            scheme: HTTP
+          initialDelaySeconds: 15
+          periodSeconds: 30
+          successThreshold: 1
+          timeoutSeconds: 15
+        resources:
+          limits:
+            cpu: 500m
+            ephemeral-storage: 1Gi
+            memory: 256Mi
+          requests:
+            cpu: 100m
+            ephemeral-storage: 1Gi
+            memory: 256Mi
+        securityContext:
+          capabilities:
+            add:
+            - NET_RAW
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+status:
+  availableReplicas: 1
+  conditions:
+  - lastTransitionTime: "2026-05-19T07:30:43Z"
+    lastUpdateTime: "2026-05-19T07:31:58Z"
+    message: ReplicaSet "fiv-api-web-79f8fb57c8" has successfully progressed.
+    reason: NewReplicaSetAvailable
+    status: "True"
+    type: Progressing
+  - lastTransitionTime: "2026-06-27T23:18:23Z"
+    lastUpdateTime: "2026-06-27T23:18:23Z"
+    message: Deployment has minimum availability.
+    reason: MinimumReplicasAvailable
+    status: "True"
+    type: Available
+  observedGeneration: 2
+  readyReplicas: 1
+  replicas: 1
+  terminatingReplicas: 0
+  updatedReplicas: 1

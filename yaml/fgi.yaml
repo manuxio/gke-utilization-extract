@@ -1,0 +1,128 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    deployment.kubernetes.io/revision: "3"
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{},"name":"fgi","namespace":"default"},"spec":{"replicas":2,"selector":{"matchLabels":{"app":"fgi"}},"template":{"metadata":{"labels":{"app":"fgi"}},"spec":{"containers":[{"env":[{"name":"DEVELOPMENT","value":"false"},{"name":"DB_HOST","value":"10.170.76.28"},{"name":"DB_SCHEMA","value":"fgi"}],"envFrom":[{"secretRef":{"name":"sendgrid-smtp"}},{"secretRef":{"name":"fgi-db"}},{"secretRef":{"name":"fgi-db-read"}},{"secretRef":{"name":"po-proxy-db"}},{"configMapRef":{"name":"vcf"}}],"image":"europe-west8-docker.pkg.dev/n-gke-fsn-prod-488511/repo-prod/fgi:2.32","imagePullPolicy":"IfNotPresent","livenessProbe":{"failureThreshold":3,"httpGet":{"path":"/user/","port":"http","scheme":"HTTP"},"initialDelaySeconds":15,"periodSeconds":60,"successThreshold":1,"timeoutSeconds":30},"name":"fgi","ports":[{"containerPort":80,"name":"http","protocol":"TCP"}],"readinessProbe":{"failureThreshold":3,"httpGet":{"path":"/user/","port":"http","scheme":"HTTP"},"initialDelaySeconds":15,"periodSeconds":60,"successThreshold":1,"timeoutSeconds":30},"resources":{"limits":{"cpu":"1","ephemeral-storage":"1Gi","memory":"2Gi"},"requests":{"cpu":"300m","ephemeral-storage":"1Gi","memory":"1Gi"}},"securityContext":{"capabilities":{"add":["NET_RAW"]}},"volumeMounts":[{"mountPath":"/var/www/fgi_files","name":"fgi-files"},{"mountPath":"/var/DRUPALFILES/po_files","name":"fgi-po"}]}],"volumes":[{"name":"fgi-files","persistentVolumeClaim":{"claimName":"fgi-files"}},{"name":"fgi-po","persistentVolumeClaim":{"claimName":"fgi-po"}}]}}}}
+  creationTimestamp: "2026-05-13T13:04:55Z"
+  generation: 35
+  name: fgi
+  namespace: default
+  resourceVersion: "1783082167893023017"
+  uid: b17dd297-4d8b-4d55-936a-da1e207e16cb
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: fgi
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: fgi
+    spec:
+      containers:
+      - env:
+        - name: DEVELOPMENT
+          value: "false"
+        - name: DB_HOST
+          value: 10.170.76.28
+        - name: DB_SCHEMA
+          value: fgi
+        envFrom:
+        - secretRef:
+            name: sendgrid-smtp
+        - secretRef:
+            name: fgi-db
+        - secretRef:
+            name: fgi-db-read
+        - secretRef:
+            name: po-proxy-db
+        - configMapRef:
+            name: vcf
+        image: europe-west8-docker.pkg.dev/n-gke-fsn-prod-488511/repo-prod/fgi:2.32
+        imagePullPolicy: IfNotPresent
+        livenessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /user/
+            port: http
+            scheme: HTTP
+          initialDelaySeconds: 15
+          periodSeconds: 60
+          successThreshold: 1
+          timeoutSeconds: 30
+        name: fgi
+        ports:
+        - containerPort: 80
+          name: http
+          protocol: TCP
+        readinessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /user/
+            port: http
+            scheme: HTTP
+          initialDelaySeconds: 15
+          periodSeconds: 60
+          successThreshold: 1
+          timeoutSeconds: 30
+        resources:
+          limits:
+            cpu: "1"
+            ephemeral-storage: 1Gi
+            memory: 2Gi
+          requests:
+            cpu: 300m
+            ephemeral-storage: 1Gi
+            memory: 1Gi
+        securityContext:
+          capabilities:
+            add:
+            - NET_RAW
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /var/www/fgi_files
+          name: fgi-files
+        - mountPath: /var/DRUPALFILES/po_files
+          name: fgi-po
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - name: fgi-files
+        persistentVolumeClaim:
+          claimName: fgi-files
+      - name: fgi-po
+        persistentVolumeClaim:
+          claimName: fgi-po
+status:
+  availableReplicas: 1
+  conditions:
+  - lastTransitionTime: "2026-05-13T13:04:55Z"
+    lastUpdateTime: "2026-06-29T10:23:59Z"
+    message: ReplicaSet "fgi-6478c9dc64" has successfully progressed.
+    reason: NewReplicaSetAvailable
+    status: "True"
+    type: Progressing
+  - lastTransitionTime: "2026-07-03T12:31:26Z"
+    lastUpdateTime: "2026-07-03T12:31:26Z"
+    message: Deployment has minimum availability.
+    reason: MinimumReplicasAvailable
+    status: "True"
+    type: Available
+  observedGeneration: 35
+  readyReplicas: 1
+  replicas: 1
+  terminatingReplicas: 0
+  updatedReplicas: 1

@@ -1,0 +1,137 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    deployment.kubernetes.io/revision: "2"
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{},"name":"fin","namespace":"default"},"spec":{"replicas":1,"selector":{"matchLabels":{"app":"fin"}},"template":{"metadata":{"labels":{"app":"fin"}},"spec":{"containers":[{"env":[{"name":"DB_HOST","value":"10.170.76.204"},{"name":"DB_SCHEMA","value":"fin"},{"name":"DB_HOST_FIN","value":"10.170.76.204"},{"name":"DB_SCHEMA_FIN","value":"fin"},{"name":"DB_PORT_FIN","value":"3306"},{"name":"DB_CONNECTION_OPTIONS_FIN","value":"?enabledTLSProtocols=TLSv1.2"},{"name":"DB_HOST_SCRIPT","value":"10.170.76.204"}],"envFrom":[{"secretRef":{"name":"sendgrid-smtp"}},{"secretRef":{"name":"fin-db"}},{"secretRef":{"name":"po-proxy-db"}},{"secretRef":{"name":"solr-db-fin"}},{"secretRef":{"name":"solr-db-script"}},{"configMapRef":{"name":"vcf"}}],"image":"europe-west8-docker.pkg.dev/n-gke-fsn-prod-488511/repo-prod/fin:latest","imagePullPolicy":"IfNotPresent","livenessProbe":{"failureThreshold":3,"httpGet":{"path":"/user/","port":"http","scheme":"HTTP"},"initialDelaySeconds":15,"periodSeconds":30,"successThreshold":1,"timeoutSeconds":15},"name":"fin","ports":[{"containerPort":80,"name":"http","protocol":"TCP"}],"readinessProbe":{"failureThreshold":3,"httpGet":{"path":"/user/","port":"http","scheme":"HTTP"},"initialDelaySeconds":15,"periodSeconds":30,"successThreshold":1,"timeoutSeconds":15},"resources":{"limits":{"cpu":"1","memory":"1024Mi"},"requests":{"cpu":"300m","memory":"512Mi"}},"securityContext":{"capabilities":{"add":["NET_RAW"]}},"volumeMounts":[{"mountPath":"/var/www/fin_files","name":"fin-files"},{"mountPath":"/var/www/po_files","name":"fin-po"},{"mountPath":"/opt/SCRIPT_SOLR","name":"fin-script"}]}],"volumes":[{"name":"fin-files","persistentVolumeClaim":{"claimName":"fin-files"}},{"name":"fin-po","persistentVolumeClaim":{"claimName":"fin-po"}},{"name":"fin-script","persistentVolumeClaim":{"claimName":"fin-script"}}]}}}}
+  creationTimestamp: "2026-05-13T13:05:22Z"
+  generation: 4
+  name: fin
+  namespace: default
+  resourceVersion: "1782663015485023007"
+  uid: 378cd930-14a1-4886-a093-d3085c341254
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 0
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: fin
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: fin
+    spec:
+      containers:
+      - env:
+        - name: DB_HOST
+          value: 10.170.76.204
+        - name: DB_SCHEMA
+          value: fin
+        - name: DB_HOST_FIN
+          value: 10.170.76.204
+        - name: DB_SCHEMA_FIN
+          value: fin
+        - name: DB_PORT_FIN
+          value: "3306"
+        - name: DB_CONNECTION_OPTIONS_FIN
+          value: ?enabledTLSProtocols=TLSv1.2
+        - name: DB_HOST_SCRIPT
+          value: 10.170.76.204
+        envFrom:
+        - secretRef:
+            name: sendgrid-smtp
+        - secretRef:
+            name: fin-db
+        - secretRef:
+            name: po-proxy-db
+        - secretRef:
+            name: solr-db-fin
+        - secretRef:
+            name: solr-db-script
+        - configMapRef:
+            name: vcf
+        image: europe-west8-docker.pkg.dev/n-gke-fsn-prod-488511/repo-prod/fin:latest
+        imagePullPolicy: IfNotPresent
+        livenessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /user/
+            port: http
+            scheme: HTTP
+          initialDelaySeconds: 15
+          periodSeconds: 30
+          successThreshold: 1
+          timeoutSeconds: 15
+        name: fin
+        ports:
+        - containerPort: 80
+          name: http
+          protocol: TCP
+        readinessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /user/
+            port: http
+            scheme: HTTP
+          initialDelaySeconds: 15
+          periodSeconds: 30
+          successThreshold: 1
+          timeoutSeconds: 15
+        resources:
+          limits:
+            cpu: "1"
+            memory: 1Gi
+          requests:
+            cpu: 300m
+            memory: 512Mi
+        securityContext:
+          capabilities:
+            add:
+            - NET_RAW
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /var/www/fin_files
+          name: fin-files
+        - mountPath: /var/www/po_files
+          name: fin-po
+        - mountPath: /opt/SCRIPT_SOLR
+          name: fin-script
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - name: fin-files
+        persistentVolumeClaim:
+          claimName: fin-files
+      - name: fin-po
+        persistentVolumeClaim:
+          claimName: fin-po
+      - name: fin-script
+        persistentVolumeClaim:
+          claimName: fin-script
+status:
+  conditions:
+  - lastTransitionTime: "2026-05-20T16:20:27Z"
+    lastUpdateTime: "2026-06-23T16:03:03Z"
+    message: ReplicaSet "fin-b5c85457f" has successfully progressed.
+    reason: NewReplicaSetAvailable
+    status: "True"
+    type: Progressing
+  - lastTransitionTime: "2026-06-27T23:25:41Z"
+    lastUpdateTime: "2026-06-27T23:25:41Z"
+    message: Deployment has minimum availability.
+    reason: MinimumReplicasAvailable
+    status: "True"
+    type: Available
+  observedGeneration: 4
+  terminatingReplicas: 0

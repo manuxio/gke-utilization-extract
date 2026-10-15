@@ -1,0 +1,134 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    deployment.kubernetes.io/revision: "2"
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{},"name":"fitri-web","namespace":"default"},"spec":{"replicas":1,"selector":{"matchLabels":{"app":"fitri-web"}},"template":{"metadata":{"labels":{"app":"fitri-web"}},"spec":{"containers":[{"env":[{"name":"APPLICATIVO","value":"fitri"},{"name":"DB_HOST","value":"10.170.76.24"},{"name":"DB_SCHEMA","value":"web_rest_fitri_new"}],"envFrom":[{"secretRef":{"name":"sendgrid-smtp"}},{"secretRef":{"name":"fitri-web-db"}},{"configMapRef":{"name":"vcf"}}],"image":"europe-west8-docker.pkg.dev/n-gke-fsn-prod-488511/repo-prod/joomla-common-php5:0.11","imagePullPolicy":"IfNotPresent","livenessProbe":{"failureThreshold":3,"httpGet":{"path":"/callbacks/check.txt","port":"http","scheme":"HTTP"},"initialDelaySeconds":15,"periodSeconds":30,"successThreshold":1,"timeoutSeconds":15},"name":"fitri-web","ports":[{"containerPort":80,"name":"http","protocol":"TCP"}],"readinessProbe":{"failureThreshold":3,"httpGet":{"path":"/callbacks/check.txt","port":"http","scheme":"HTTP"},"initialDelaySeconds":15,"periodSeconds":30,"successThreshold":1,"timeoutSeconds":15},"resources":{"limits":{"cpu":"500m","ephemeral-storage":"1Gi","memory":"256Mi"},"requests":{"cpu":"100m","ephemeral-storage":"1Gi","memory":"256Mi"}},"securityContext":{"capabilities":{"add":["NET_RAW"]}},"volumeMounts":[{"mountPath":"/var/www/html/app","name":"fitri-web-docroot"},{"mountPath":"/var/www/html/app/fitri_files","name":"fitri-web-files"},{"mountPath":"/etc/apache2/sites-available","name":"fitri-web-sitesavailable"},{"mountPath":"/etc/apache2/sites-enabled","name":"fitri-web-sitesenabled"}]}],"volumes":[{"name":"fitri-web-docroot","persistentVolumeClaim":{"claimName":"fitri-web-docroot"}},{"name":"fitri-web-files","persistentVolumeClaim":{"claimName":"fitri-web-files"}},{"name":"fitri-web-sitesavailable","persistentVolumeClaim":{"claimName":"fitri-web-sitesavailable"}},{"name":"fitri-web-sitesenabled","persistentVolumeClaim":{"claimName":"fitri-web-sitesenabled"}}]}}}}
+  creationTimestamp: "2026-05-13T13:05:48Z"
+  generation: 3
+  name: fitri-web
+  namespace: default
+  resourceVersion: "1782602293679039002"
+  uid: a785d546-19d6-4a9d-ac02-853953be12e5
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: fitri-web
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: fitri-web
+    spec:
+      containers:
+      - env:
+        - name: APPLICATIVO
+          value: fitri
+        - name: DB_HOST
+          value: 10.170.76.24
+        - name: DB_SCHEMA
+          value: web_rest_fitri_new
+        envFrom:
+        - secretRef:
+            name: sendgrid-smtp
+        - secretRef:
+            name: fitri-web-db
+        - configMapRef:
+            name: vcf
+        image: europe-west8-docker.pkg.dev/n-gke-fsn-prod-488511/repo-prod/joomla-common-php5:0.11
+        imagePullPolicy: IfNotPresent
+        livenessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /callbacks/check.txt
+            port: http
+            scheme: HTTP
+          initialDelaySeconds: 15
+          periodSeconds: 30
+          successThreshold: 1
+          timeoutSeconds: 15
+        name: fitri-web
+        ports:
+        - containerPort: 80
+          name: http
+          protocol: TCP
+        readinessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /callbacks/check.txt
+            port: http
+            scheme: HTTP
+          initialDelaySeconds: 15
+          periodSeconds: 30
+          successThreshold: 1
+          timeoutSeconds: 15
+        resources:
+          limits:
+            cpu: 500m
+            ephemeral-storage: 1Gi
+            memory: 256Mi
+          requests:
+            cpu: 100m
+            ephemeral-storage: 1Gi
+            memory: 256Mi
+        securityContext:
+          capabilities:
+            add:
+            - NET_RAW
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /var/www/html/app
+          name: fitri-web-docroot
+        - mountPath: /var/www/html/app/fitri_files
+          name: fitri-web-files
+        - mountPath: /etc/apache2/sites-available
+          name: fitri-web-sitesavailable
+        - mountPath: /etc/apache2/sites-enabled
+          name: fitri-web-sitesenabled
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - name: fitri-web-docroot
+        persistentVolumeClaim:
+          claimName: fitri-web-docroot
+      - name: fitri-web-files
+        persistentVolumeClaim:
+          claimName: fitri-web-files
+      - name: fitri-web-sitesavailable
+        persistentVolumeClaim:
+          claimName: fitri-web-sitesavailable
+      - name: fitri-web-sitesenabled
+        persistentVolumeClaim:
+          claimName: fitri-web-sitesenabled
+status:
+  availableReplicas: 1
+  conditions:
+  - lastTransitionTime: "2026-05-13T13:05:48Z"
+    lastUpdateTime: "2026-06-23T16:02:43Z"
+    message: ReplicaSet "fitri-web-86df97f4c5" has successfully progressed.
+    reason: NewReplicaSetAvailable
+    status: "True"
+    type: Progressing
+  - lastTransitionTime: "2026-06-27T23:18:13Z"
+    lastUpdateTime: "2026-06-27T23:18:13Z"
+    message: Deployment has minimum availability.
+    reason: MinimumReplicasAvailable
+    status: "True"
+    type: Available
+  observedGeneration: 3
+  readyReplicas: 1
+  replicas: 1
+  terminatingReplicas: 0
+  updatedReplicas: 1

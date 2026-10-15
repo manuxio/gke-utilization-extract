@@ -1,0 +1,124 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    deployment.kubernetes.io/revision: "2"
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{},"name":"figs","namespace":"default"},"spec":{"replicas":1,"selector":{"matchLabels":{"app":"figs"}},"template":{"metadata":{"labels":{"app":"figs"}},"spec":{"containers":[{"env":[{"name":"DEVELOPMENT","value":"false"},{"name":"DB_HOST","value":"10.170.76.24"},{"name":"DB_SCHEMA","value":"figs"}],"envFrom":[{"secretRef":{"name":"sendgrid-smtp"}},{"secretRef":{"name":"figs-db"}},{"secretRef":{"name":"po-proxy-db"}},{"configMapRef":{"name":"vcf"}}],"image":"europe-west8-docker.pkg.dev/n-gke-fsn-prod-488511/repo-prod/figs:latest","imagePullPolicy":"IfNotPresent","livenessProbe":{"failureThreshold":3,"httpGet":{"path":"/user/","port":"http","scheme":"HTTP"},"initialDelaySeconds":15,"periodSeconds":30,"successThreshold":1,"timeoutSeconds":15},"name":"figs","ports":[{"containerPort":80,"name":"http","protocol":"TCP"}],"readinessProbe":{"failureThreshold":3,"httpGet":{"path":"/user/","port":"http","scheme":"HTTP"},"initialDelaySeconds":15,"periodSeconds":30,"successThreshold":1,"timeoutSeconds":15},"resources":{"limits":{"cpu":"1","memory":"1024Mi"},"requests":{"cpu":"300m","memory":"512Mi"}},"securityContext":{"capabilities":{"add":["NET_RAW"]}},"volumeMounts":[{"mountPath":"/var/www/figs_files","name":"figs-files"},{"mountPath":"/var/DRUPALFILES/po_files","name":"figs-po"}]}],"volumes":[{"name":"figs-files","persistentVolumeClaim":{"claimName":"figs-files"}},{"name":"figs-po","persistentVolumeClaim":{"claimName":"figs-po"}}]}}}}
+  creationTimestamp: "2026-05-13T13:05:10Z"
+  generation: 3
+  name: figs
+  namespace: default
+  resourceVersion: "1782602263646287010"
+  uid: e4a56dcd-b642-4232-a056-39c828219350
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: figs
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: figs
+    spec:
+      containers:
+      - env:
+        - name: DEVELOPMENT
+          value: "false"
+        - name: DB_HOST
+          value: 10.170.76.24
+        - name: DB_SCHEMA
+          value: figs
+        envFrom:
+        - secretRef:
+            name: sendgrid-smtp
+        - secretRef:
+            name: figs-db
+        - secretRef:
+            name: po-proxy-db
+        - configMapRef:
+            name: vcf
+        image: europe-west8-docker.pkg.dev/n-gke-fsn-prod-488511/repo-prod/figs:latest
+        imagePullPolicy: IfNotPresent
+        livenessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /user/
+            port: http
+            scheme: HTTP
+          initialDelaySeconds: 15
+          periodSeconds: 30
+          successThreshold: 1
+          timeoutSeconds: 15
+        name: figs
+        ports:
+        - containerPort: 80
+          name: http
+          protocol: TCP
+        readinessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /user/
+            port: http
+            scheme: HTTP
+          initialDelaySeconds: 15
+          periodSeconds: 30
+          successThreshold: 1
+          timeoutSeconds: 15
+        resources:
+          limits:
+            cpu: "1"
+            memory: 1Gi
+          requests:
+            cpu: 300m
+            memory: 512Mi
+        securityContext:
+          capabilities:
+            add:
+            - NET_RAW
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /var/www/figs_files
+          name: figs-files
+        - mountPath: /var/DRUPALFILES/po_files
+          name: figs-po
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - name: figs-files
+        persistentVolumeClaim:
+          claimName: figs-files
+      - name: figs-po
+        persistentVolumeClaim:
+          claimName: figs-po
+status:
+  availableReplicas: 1
+  conditions:
+  - lastTransitionTime: "2026-05-18T09:40:47Z"
+    lastUpdateTime: "2026-06-23T16:02:02Z"
+    message: ReplicaSet "figs-59c554d4" has successfully progressed.
+    reason: NewReplicaSetAvailable
+    status: "True"
+    type: Progressing
+  - lastTransitionTime: "2026-06-27T23:17:43Z"
+    lastUpdateTime: "2026-06-27T23:17:43Z"
+    message: Deployment has minimum availability.
+    reason: MinimumReplicasAvailable
+    status: "True"
+    type: Available
+  observedGeneration: 3
+  readyReplicas: 1
+  replicas: 1
+  terminatingReplicas: 0
+  updatedReplicas: 1

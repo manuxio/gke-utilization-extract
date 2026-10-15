@@ -1,0 +1,118 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    deployment.kubernetes.io/revision: "2"
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{},"name":"canoemilan2025-web","namespace":"default"},"spec":{"replicas":1,"selector":{"matchLabels":{"app":"canoemilan2025-web"}},"template":{"metadata":{"labels":{"app":"canoemilan2025-web"}},"spec":{"containers":[{"env":[{"name":"APPLICATIVO","value":"canoemilan2025"}],"image":"europe-west8-docker.pkg.dev/n-gke-fsn-prod-488511/repo-prod/joomla-common-php8-1-27-iti-log:0.1","imagePullPolicy":"IfNotPresent","livenessProbe":{"failureThreshold":3,"httpGet":{"path":"/administrator/","port":"http","scheme":"HTTP"},"initialDelaySeconds":15,"periodSeconds":30,"successThreshold":1,"timeoutSeconds":15},"name":"canoemilan2025-web","ports":[{"containerPort":80,"name":"http","protocol":"TCP"}],"readinessProbe":{"failureThreshold":3,"httpGet":{"path":"/administrator/","port":"http","scheme":"HTTP"},"initialDelaySeconds":15,"periodSeconds":30,"successThreshold":1,"timeoutSeconds":15},"resources":{"limits":{"cpu":"1","ephemeral-storage":"1Gi","memory":"1024Mi"},"requests":{"cpu":"300m","ephemeral-storage":"1Gi","memory":"512Mi"}},"securityContext":{"capabilities":{"add":["NET_RAW"]}},"volumeMounts":[{"mountPath":"/var/www/html/app","name":"canoemilan2025-web-docroot"},{"mountPath":"/etc/apache2/sites-available","name":"canoemilan2025-web-sitesavailable"},{"mountPath":"/etc/apache2/sites-enabled","name":"canoemilan2025-web-sitesenabled"}]}],"volumes":[{"name":"canoemilan2025-web-docroot","persistentVolumeClaim":{"claimName":"canoemilan2025-web-docroot"}},{"name":"canoemilan2025-web-sitesavailable","persistentVolumeClaim":{"claimName":"canoemilan2025-web-sitesavailable"}},{"name":"canoemilan2025-web-sitesenabled","persistentVolumeClaim":{"claimName":"canoemilan2025-web-sitesenabled"}}]}}}}
+  creationTimestamp: "2026-04-16T13:58:23Z"
+  generation: 4
+  name: canoemilan2025-web
+  namespace: default
+  resourceVersion: "1782602396773823005"
+  uid: 26d35f8d-1898-46c6-bc83-551479b8a60f
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: canoemilan2025-web
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: canoemilan2025-web
+    spec:
+      containers:
+      - env:
+        - name: APPLICATIVO
+          value: canoemilan2025
+        image: europe-west8-docker.pkg.dev/n-gke-fsn-prod-488511/repo-prod/joomla-common-php8-1-27-iti-log:0.1
+        imagePullPolicy: IfNotPresent
+        livenessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /administrator/
+            port: http
+            scheme: HTTP
+          initialDelaySeconds: 15
+          periodSeconds: 30
+          successThreshold: 1
+          timeoutSeconds: 15
+        name: canoemilan2025-web
+        ports:
+        - containerPort: 80
+          name: http
+          protocol: TCP
+        readinessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /administrator/
+            port: http
+            scheme: HTTP
+          initialDelaySeconds: 15
+          periodSeconds: 30
+          successThreshold: 1
+          timeoutSeconds: 15
+        resources:
+          limits:
+            cpu: "1"
+            ephemeral-storage: 1Gi
+            memory: 1Gi
+          requests:
+            cpu: 300m
+            ephemeral-storage: 1Gi
+            memory: 512Mi
+        securityContext:
+          capabilities:
+            add:
+            - NET_RAW
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /var/www/html/app
+          name: canoemilan2025-web-docroot
+        - mountPath: /etc/apache2/sites-available
+          name: canoemilan2025-web-sitesavailable
+        - mountPath: /etc/apache2/sites-enabled
+          name: canoemilan2025-web-sitesenabled
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - name: canoemilan2025-web-docroot
+        persistentVolumeClaim:
+          claimName: canoemilan2025-web-docroot
+      - name: canoemilan2025-web-sitesavailable
+        persistentVolumeClaim:
+          claimName: canoemilan2025-web-sitesavailable
+      - name: canoemilan2025-web-sitesenabled
+        persistentVolumeClaim:
+          claimName: canoemilan2025-web-sitesenabled
+status:
+  availableReplicas: 1
+  conditions:
+  - lastTransitionTime: "2026-04-16T13:58:23Z"
+    lastUpdateTime: "2026-05-13T13:05:48Z"
+    message: ReplicaSet "canoemilan2025-web-7b97ddfcfb" has successfully progressed.
+    reason: NewReplicaSetAvailable
+    status: "True"
+    type: Progressing
+  - lastTransitionTime: "2026-06-27T23:19:56Z"
+    lastUpdateTime: "2026-06-27T23:19:56Z"
+    message: Deployment has minimum availability.
+    reason: MinimumReplicasAvailable
+    status: "True"
+    type: Available
+  observedGeneration: 4
+  readyReplicas: 1
+  replicas: 1
+  terminatingReplicas: 0
+  updatedReplicas: 1

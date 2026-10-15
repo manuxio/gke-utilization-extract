@@ -9,15 +9,18 @@
   "scripts": {
     "build": "tsc",
     "start": "node dist/extract-gke-utilization.js",
-    "extract": "npm run build && node dist/extract-gke-utilization.js"
+    "extract": "npm run build && node dist/extract-gke-utilization.js",
+    "analyze": "npm run build && node dist/analyze-utilization.js"
   },
   "engines": {
     "node": ">=18.17"
   },
   "dependencies": {
-    "@google-cloud/monitoring": "^4.1.0"
+    "@google-cloud/monitoring": "^4.1.0",
+    "js-yaml": "^4.3.0"
   },
   "devDependencies": {
+    "@types/js-yaml": "^4.0.9",
     "@types/node": "^20.14.0",
     "typescript": "^5.5.0"
   }
