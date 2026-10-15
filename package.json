@@ -10,7 +10,9 @@
     "build": "tsc",
     "start": "node dist/extract-gke-utilization.js",
     "extract": "npm run build && node dist/extract-gke-utilization.js",
-    "analyze": "npm run build && node dist/analyze-utilization.js"
+    "analyze": "npm run build && node dist/analyze-utilization.js",
+    "extract-all": "npm run build && node dist/extract-all.js",
+    "export-yaml": "npm run build && node dist/export-yaml.js"
   },
   "engines": {
     "node": ">=18.17"

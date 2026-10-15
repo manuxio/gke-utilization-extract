@@ -44,6 +44,7 @@ const RESOURCE_TYPE = 'k8s_container';
 // ---------------------------------------------------------------------------
 interface Cli {
   project?: string;
+  cluster?: string;
   window: string;
   appField: string;
   align?: number;
@@ -58,7 +59,8 @@ function usage(): string {
     '',
     'Options:',
     '  --project <id>       GCP project id (default: $GOOGLE_CLOUD_PROJECT or ADC project)',
-    '  --window <dur>       Look-back window: 7d, 24h, 90m, 3600s (default: 7d)',
+    '  --cluster <name>     Only this GKE cluster (default: all clusters in the project)',
+    '  --window <dur>       Look-back window: 7d, 24h, 90m, 3600s (default: 14d)',
     '  --app-field <spec>   Field that identifies an app',
     `                       (default: ${DEFAULT_APP_FIELD})`,
     '  --align <seconds>    If set, apply ALIGN_MEAN at this period. Default: off (raw points)',
@@ -82,7 +84,8 @@ function parseCli(): Cli {
   const { values } = parseArgs({
     options: {
       project: { type: 'string' },
-      window: { type: 'string', default: '7d' },
+      cluster: { type: 'string' },
+      window: { type: 'string', default: '14d' },
       'app-field': { type: 'string' },
       align: { type: 'string' },
       out: { type: 'string' },
@@ -109,7 +112,8 @@ function parseCli(): Cli {
   const today = new Date().toISOString().slice(0, 10); // YYYY-MM-DD (UTC)
   return {
     project: values.project,
-    window: values.window ?? '7d',
+    cluster: values.cluster,
+    window: values.window ?? '14d',
     appField: values['app-field'] ?? DEFAULT_APP_FIELD,
     align,
     out: values.out ?? `gke-utilization-${today}.csv`,
@@ -252,7 +256,7 @@ async function main(): Promise<void> {
   log(`[1/4] Resolving credentials + project… ok (project=${projectId})`);
   if (cli.verbose) {
     log(
-      `      window=${cli.window} (${windowSeconds}s) interval=[${startIso} .. ${endIso}] ` +
+      `      cluster=${cli.cluster ?? '(all)'} window=${cli.window} (${windowSeconds}s) interval=[${startIso} .. ${endIso}] ` +
         `app-field=${cli.appField} align=${cli.align ? cli.align + 's ALIGN_MEAN' : 'off (raw)'} out=${cli.out}`,
     );
   }
@@ -274,7 +278,9 @@ async function main(): Promise<void> {
   try {
     for (let i = 0; i < METRICS.length; i++) {
       const metric = METRICS[i];
-      const filter = `metric.type = "${metric.type}" AND resource.type = "${RESOURCE_TYPE}"`;
+      const filter =
+        `metric.type = "${metric.type}" AND resource.type = "${RESOURCE_TYPE}"` +
+        (cli.cluster ? ` AND resource.labels.cluster_name = "${cli.cluster}"` : '');
       const baseRequest: any = {
         name: projectName,
         filter,
@@ -353,6 +359,7 @@ async function main(): Promise<void> {
     // On error, report project / metric window context and exit non-zero.
     warn('ERROR while fetching/writing time series:');
     warn(`  project : ${projectId}`);
+    if (cli.cluster) warn(`  cluster : ${cli.cluster}`);
     warn(`  metrics : ${METRICS.map((m) => m.short).join(', ')}`);
     warn(`  window  : ${cli.window} [${startIso} .. ${endIso}]`);
     warn(`  out     : ${cli.out}`);
