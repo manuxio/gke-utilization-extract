@@ -23,6 +23,7 @@
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import * as readline from 'node:readline';
+import * as zlib from 'node:zlib';
 import { parseArgs } from 'node:util';
 import * as yaml from 'js-yaml';
 
@@ -60,7 +61,7 @@ interface Cli {
 function findLatestCsv(): string {
   const files = fs
     .readdirSync(process.cwd())
-    .filter((f) => /^gke-utilization-\d{4}-\d{2}-\d{2}\.csv$/.test(f))
+    .filter((f) => /^gke-utilization-\d{4}-\d{2}-\d{2}\.csv(\.gz)?$/.test(f))
     .sort();
   if (!files.length) throw new Error('No gke-utilization-*.csv found in cwd; pass --in <file>');
   return files[files.length - 1];
@@ -94,7 +95,7 @@ function parseCli(): Cli {
     process.stdout.write(
       [
         'Usage: analyze-utilization [options]',
-        '  --in <file>            Input CSV (default: latest gke-utilization-*.csv)',
+        '  --in <file>            Input CSV or .csv.gz (default: latest gke-utilization-*.csv[.gz])',
         '  --app <a,b,...>        Only these apps (default: all)',
         '  --out <file>           Output HTML (default: derived from input + apps)',
         '  --csv <file>           Apply-table CSV (default: <out>.apply.csv)',
@@ -946,7 +947,9 @@ async function main(): Promise<void> {
   const containersByApp = new Map<string, Set<string>>();
   const appMeta = new Map<string, { points: number; tsMin: string; tsMax: string }>();
 
-  const rl = readline.createInterface({ input: fs.createReadStream(cli.in), crlfDelay: Infinity });
+  const raw = fs.createReadStream(cli.in);
+  const input = /\.gz$/i.test(cli.in) ? raw.pipe(zlib.createGunzip()) : raw;
+  const rl = readline.createInterface({ input, crlfDelay: Infinity });
   let first = true;
   let rows = 0;
   for await (const line of rl) {

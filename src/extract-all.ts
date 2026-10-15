@@ -167,7 +167,7 @@ function main(): void {
     results.push(res);
     log(`[2/3] Cluster ${i + 1}/${clusters.length}: ${c.project}/${c.name} (${c.location})`);
 
-    const csvPath = path.join(dir, 'gke-utilization.csv');
+    const csvPath = path.join(dir, 'gke-utilization.csv.gz');
     res.csv = runNode('extract-gke-utilization.js', [
       '--project', c.project, '--cluster', c.name, '--window', cli.window, '--out', csvPath, '--quiet',
     ]);

@@ -15,6 +15,7 @@
  */
 import * as fs from 'node:fs';
 import { once } from 'node:events';
+import * as zlib from 'node:zlib';
 import { parseArgs } from 'node:util';
 import { MetricServiceClient } from '@google-cloud/monitoring';
 
@@ -48,6 +49,8 @@ interface Cli {
   window: string;
   appField: string;
   align?: number;
+  chunk: number; // seconds per request interval
+  timeout: number; // per-page API timeout, seconds
   out: string;
   quiet: boolean;
   verbose: boolean;
@@ -63,8 +66,10 @@ function usage(): string {
     '  --window <dur>       Look-back window: 7d, 24h, 90m, 3600s (default: 14d)',
     '  --app-field <spec>   Field that identifies an app',
     `                       (default: ${DEFAULT_APP_FIELD})`,
-    '  --align <seconds>    If set, apply ALIGN_MEAN at this period. Default: off (raw points)',
-    '  --out <path>         Output CSV path (default: gke-utilization-<YYYY-MM-DD>.csv)',
+    '  --align <seconds>    ALIGN_MEAN period (default: 60). 0 = raw points',
+    '  --chunk <dur>        Split the window into requests of this size (default: 1d)',
+    '  --timeout <seconds>  Per-page API timeout (default: 300; the client default of 30 is too short for big windows)',
+    '  --out <path>         Output CSV path; .gz is gzipped (default: gke-utilization-<YYYY-MM-DD>.csv.gz)',
     '  --quiet              Suppress progress output',
     '  --verbose            Log resolved request parameters',
     '  --help               Show this help',
@@ -87,7 +92,9 @@ function parseCli(): Cli {
       cluster: { type: 'string' },
       window: { type: 'string', default: '14d' },
       'app-field': { type: 'string' },
-      align: { type: 'string' },
+      align: { type: 'string', default: '60' },
+      chunk: { type: 'string', default: '1d' },
+      timeout: { type: 'string', default: '300' },
       out: { type: 'string' },
       quiet: { type: 'boolean', default: false },
       verbose: { type: 'boolean', default: false },
@@ -101,12 +108,10 @@ function parseCli(): Cli {
     process.exit(0);
   }
 
-  let align: number | undefined;
-  if (values.align != null) {
-    align = Number(values.align);
-    if (!Number.isFinite(align) || align <= 0) {
-      throw new Error(`Invalid --align "${values.align}" (expected a positive number of seconds)`);
-    }
+  // --align 0 => raw points
+  const align = Number(values.align);
+  if (!Number.isFinite(align) || align < 0) {
+    throw new Error(`Invalid --align "${values.align}" (expected seconds, 0 for raw points)`);
   }
 
   const today = new Date().toISOString().slice(0, 10); // YYYY-MM-DD (UTC)
@@ -115,8 +120,10 @@ function parseCli(): Cli {
     cluster: values.cluster,
     window: values.window ?? '14d',
     appField: values['app-field'] ?? DEFAULT_APP_FIELD,
-    align,
-    out: values.out ?? `gke-utilization-${today}.csv`,
+    align: align || undefined,
+    chunk: parseWindowSeconds(values.chunk ?? '1d'),
+    timeout: Number(values.timeout) > 0 ? Number(values.timeout) : 300,
+    out: values.out ?? `gke-utilization-${today}.csv.gz`,
     quiet: Boolean(values.quiet),
     verbose: Boolean(values.verbose),
   };
@@ -194,7 +201,14 @@ export function makeAppResolver(fieldSpec: string): (series: any) => string | un
 class CsvSink {
   private buf = '';
   private static FLUSH_AT = 1 << 20; // 1 MiB
-  constructor(private readonly stream: fs.WriteStream) {}
+  private readonly stream: NodeJS.WritableStream;
+  /** `file` is the on-disk stream; when gzip is set, rows go through it first. */
+  constructor(
+    private readonly file: fs.WriteStream,
+    gzip?: zlib.Gzip,
+  ) {
+    this.stream = gzip ? (gzip.pipe(file), gzip) : file;
+  }
 
   async push(line: string): Promise<void> {
     this.buf += line;
@@ -211,7 +225,7 @@ class CsvSink {
   async end(): Promise<void> {
     await this.flush();
     this.stream.end();
-    await once(this.stream, 'finish');
+    await once(this.file, 'finish');
   }
 }
 
@@ -261,15 +275,29 @@ async function main(): Promise<void> {
     );
   }
 
-  // Optional alignment (default: off => fully raw points)
+  // Alignment (default 60s ALIGN_MEAN; --align 0 => fully raw points)
   const aggregation = cli.align
     ? { alignmentPeriod: { seconds: cli.align }, perSeriesAligner: 'ALIGN_MEAN' as const }
     : undefined;
 
   // Open output CSV and write header
   const stream = fs.createWriteStream(cli.out, { encoding: 'utf8' });
-  const fatalStreamError = new Promise<never>((_, reject) => stream.on('error', reject));
-  const sink = new CsvSink(stream);
+  const gzip = /\.gz$/i.test(cli.out) ? zlib.createGzip() : undefined;
+  const fatalStreamError = new Promise<never>((_, reject) => {
+    stream.on('error', reject);
+    gzip?.on('error', reject);
+  });
+  const sink = new CsvSink(stream, gzip);
+
+  // Split the window into chunks so no single request has to scan the whole range.
+  // Boundaries are snapped to the alignment period so aligned points never straddle two chunks.
+  const step = cli.align ?? 1;
+  const snap = (sec: number) => Math.floor(sec / step) * step;
+  const chunkSec = Math.max(step, snap(cli.chunk));
+  const chunks: Array<{ startTime: { seconds: number }; endTime: { seconds: number } }> = [];
+  for (let s = snap(interval.startTime.seconds); s < interval.endTime.seconds; s += chunkSec) {
+    chunks.push({ startTime: { seconds: s }, endTime: { seconds: Math.min(s + chunkSec, interval.endTime.seconds) } });
+  }
   await sink.push('timestamp,app,container_name,pod_name,namespace,metric,value\n');
 
   const appsSeen = new Set<string>();
@@ -281,62 +309,65 @@ async function main(): Promise<void> {
       const filter =
         `metric.type = "${metric.type}" AND resource.type = "${RESOURCE_TYPE}"` +
         (cli.cluster ? ` AND resource.labels.cluster_name = "${cli.cluster}"` : '');
-      const baseRequest: any = {
-        name: projectName,
-        filter,
-        interval,
-        view: 'FULL',
-        ...(aggregation ? { aggregation } : {}),
-      };
-
-      log(`[2/4] Fetching metric ${i + 1}/4: ${metric.short}…`);
+      log(`[2/4] Fetching metric ${i + 1}/4: ${metric.short} (${chunks.length} chunk(s))…`);
       if (cli.verbose) log(`      filter: ${filter}`);
 
-      let request: any = baseRequest;
-      let page = 0;
       let seriesCount = 0;
       let pointCount = 0;
 
-      // Manual pagination so we can log page progress and stream rows as we go.
-      while (true) {
-        const result: any = await Promise.race([
-          client.listTimeSeries(request, { autoPaginate: false }),
-          fatalStreamError,
-        ]);
-        const timeSeries: any[] = result[0] ?? [];
-        const nextRequest: any = result[1];
-        const rawResponse: any = result[2];
-        page++;
-        seriesCount += timeSeries.length;
+      for (const chunk of chunks) {
+        const baseRequest: any = {
+          name: projectName,
+          filter,
+          interval: chunk,
+          view: 'FULL',
+          ...(aggregation ? { aggregation } : {}),
+        };
 
-        // [3/4] Write rows for this page
-        for (const series of timeSeries) {
-          const labels = series?.resource?.labels ?? {};
-          const container = labels.container_name ?? '';
-          const pod = labels.pod_name ?? '';
-          const namespace = labels.namespace_name ?? '';
-          const app = appOf(series) || container || 'unknown';
-          appsSeen.add(app);
+        let request: any = baseRequest;
+        let page = 0;
 
-          const points: any[] = series?.points ?? [];
-          for (const p of points) {
-            const value = pointValue(p);
-            if (value == null) continue; // skip non-numeric / empty points
-            const iso = tsToIso(p?.interval?.endTime);
-            await sink.push(
-              `${csv(iso)},${csv(app)},${csv(container)},${csv(pod)},${csv(namespace)},${metric.short},${value}\n`,
-            );
-            totalRows++;
-            pointCount++;
+        // Manual pagination so we can log page progress and stream rows as we go.
+        while (true) {
+          const result: any = await Promise.race([
+            client.listTimeSeries(request, { autoPaginate: false, timeout: cli.timeout * 1000 }),
+            fatalStreamError,
+          ]);
+          const timeSeries: any[] = result[0] ?? [];
+          const nextRequest: any = result[1];
+          const rawResponse: any = result[2];
+          page++;
+          seriesCount += timeSeries.length;
+
+          // [3/4] Write rows for this page
+          for (const series of timeSeries) {
+            const labels = series?.resource?.labels ?? {};
+            const container = labels.container_name ?? '';
+            const pod = labels.pod_name ?? '';
+            const namespace = labels.namespace_name ?? '';
+            const app = appOf(series) || container || 'unknown';
+            appsSeen.add(app);
+
+            const points: any[] = series?.points ?? [];
+            for (const p of points) {
+              const value = pointValue(p);
+              if (value == null) continue; // skip non-numeric / empty points
+              const iso = tsToIso(p?.interval?.endTime);
+              await sink.push(
+                `${csv(iso)},${csv(app)},${csv(container)},${csv(pod)},${csv(namespace)},${metric.short},${value}\n`,
+              );
+              totalRows++;
+              pointCount++;
+            }
           }
-        }
 
-        const token = nextRequest?.pageToken || rawResponse?.nextPageToken;
-        log(
-          `        page ${page}: ${timeSeries.length} series (cumulative ${seriesCount} series, ${human(pointCount)} points)`,
-        );
-        if (!token) break;
-        request = { ...baseRequest, pageToken: token };
+          const token = nextRequest?.pageToken || rawResponse?.nextPageToken;
+          log(
+            `        ${tsToIso(chunk.startTime).slice(0, 10)} page ${page}: ${timeSeries.length} series (cumulative ${seriesCount} series, ${human(pointCount)} points)`,
+          );
+          if (!token) break;
+          request = { ...baseRequest, pageToken: token };
+        }
       }
 
       if (seriesCount === 0) {
