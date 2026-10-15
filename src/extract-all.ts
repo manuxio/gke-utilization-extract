@@ -83,7 +83,8 @@ const log = (m: string) => process.stderr.write(`${m} [${((Date.now() - started)
 
 /** Run one of our own compiled scripts with live output. Returns true on success. */
 function runNode(script: string, args: string[]): boolean {
-  const r = spawnSync(process.execPath, [path.join(__dirname, script), ...args], { stdio: 'inherit' });
+  // Big clusters × 14 days do not fit the default ~4 GB heap.
+  const r = spawnSync(process.execPath, ['--max-old-space-size=8192', path.join(__dirname, script), ...args], { stdio: 'inherit' });
   return r.status === 0;
 }
 

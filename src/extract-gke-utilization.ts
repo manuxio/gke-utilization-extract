@@ -353,6 +353,8 @@ async function main(): Promise<void> {
               const value = pointValue(p);
               if (value == null) continue; // skip non-numeric / empty points
               const iso = tsToIso(p?.interval?.endTime);
+              // A point exactly on a chunk boundary may come back in both chunks; keep it in the earlier one.
+              if (chunk !== chunks[0] && Date.parse(iso) <= chunk.startTime.seconds * 1000) continue;
               await sink.push(
                 `${csv(iso)},${csv(app)},${csv(container)},${csv(pod)},${csv(namespace)},${metric.short},${value}\n`,
               );

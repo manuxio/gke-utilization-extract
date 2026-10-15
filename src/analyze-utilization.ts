@@ -939,9 +939,11 @@ async function main(): Promise<void> {
   log(`[1/3] Reading ${cli.in} (agg=${cli.agg}${cli.apps ? `, apps=${[...cli.apps].join(',')}` : ', all apps'})…`);
 
   // Aggregation stores.
-  //  sum/avg: key -> Map<ts, {s, n}>   (per-timestamp accumulation)
+  //  sum/avg: key -> day -> dense per-minute {s, n} arrays. Timestamps are bucketed to the
+  //           minute (the extractor aligns at 60s), and typed arrays keep 14 days × hundreds
+  //           of apps in a few hundred MB instead of blowing the heap with string-keyed maps.
   //  pool   : key -> number[]          (all raw points)
-  const byTs = new Map<string, Map<string, { s: number; n: number }>>();
+  const byMinute = new Map<string, Map<number, { s: Float64Array; n: Uint16Array }>>();
   const pooled = new Map<string, number[]>();
   const podsByApp = new Map<string, Set<string>>();
   const containersByApp = new Map<string, Set<string>>();
@@ -992,13 +994,16 @@ async function main(): Promise<void> {
       if (!arr) pooled.set(key, (arr = []));
       arr.push(value);
     } else {
-      let m = byTs.get(key);
-      if (!m) byTs.set(key, (m = new Map()));
-      const cur = m.get(ts);
-      if (cur) {
-        cur.s += value;
-        cur.n += 1;
-      } else m.set(ts, { s: value, n: 1 });
+      const minute = Math.floor(Date.parse(ts) / 60_000);
+      if (!Number.isFinite(minute)) continue;
+      const day = Math.floor(minute / 1440);
+      let days = byMinute.get(key);
+      if (!days) byMinute.set(key, (days = new Map()));
+      let b = days.get(day);
+      if (!b) days.set(day, (b = { s: new Float64Array(1440), n: new Uint16Array(1440) }));
+      const i = minute - day * 1440;
+      b.s[i] += value;
+      b.n[i] += 1;
     }
   }
   log(`[2/3] Scanned ${rows.toLocaleString()} matching rows; ${podsByApp.size} app(s). Computing stats…`);
@@ -1017,10 +1022,12 @@ async function main(): Promise<void> {
   const seriesFor = (app: string, metric: string): number[] => {
     const key = app + ' ' + metric;
     if (cli.agg === 'pool') return pooled.get(key) ?? [];
-    const m = byTs.get(key);
-    if (!m) return [];
+    const days = byMinute.get(key);
+    if (!days) return [];
     const out: number[] = [];
-    for (const { s, n } of m.values()) out.push(cli.agg === 'avg' ? s / n : s);
+    for (const { s, n } of days.values()) {
+      for (let i = 0; i < 1440; i++) if (n[i]) out.push(cli.agg === 'avg' ? s[i] / n[i] : s[i]);
+    }
     return out;
   };
 
